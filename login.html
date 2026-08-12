@@ -253,7 +253,7 @@ const firebaseConfig = {
                     console.error(error);
 
                     message.textContent =
-                        "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                      "خطأ Firebase: " + error.code;
 
                     loginButton.disabled = false;
 
