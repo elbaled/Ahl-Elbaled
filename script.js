@@ -583,6 +583,17 @@ if (form) {
    عرض الخدمات المقبولة
 ===================================== */
 
+/* =====================================
+   بيانات وفلترة الخدمات
+===================================== */
+
+let allServices = {};
+
+
+/* =====================================
+   تحميل الخدمات
+===================================== */
+
 if (servicesContainer) {
 
     const servicesRef =
@@ -598,143 +609,12 @@ if (servicesContainer) {
 
         (snapshot) => {
 
-            servicesContainer.innerHTML =
-                "";
+            allServices =
+                snapshot.val() || {};
 
-
-            const data =
-                snapshot.val();
-
-
-            if (!data) {
-
-                showEmptyServices();
-
-                return;
-
-            }
-
-
-            let count =
-                0;
-
-
-            Object.entries(data)
-                .forEach(
-                    ([id, service]) => {
-
-                        if (
-                            service.status !==
-                            "approved"
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        count++;
-
-
-                        const card =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        card.className =
-                            "service-card";
-
-
-                        card.dataset.serviceId =
-                            id;
-
-
-                        card.innerHTML = `
-
-                            <div class="service-image">
-
-                                🏪
-
-                            </div>
-
-                            <div class="service-content">
-
-                                <h3>
-                                    ${escapeHTML(
-                                        service.name
-                                    )}
-                                </h3>
-
-                                <p>
-                                    ${escapeHTML(
-                                        service.description
-                                    )}
-                                </p>
-
-                                <div class="service-meta">
-
-                                    <span class="meta-item">
-
-                                        📍
-                                        ${escapeHTML(
-                                            service.address
-                                        )}
-
-                                    </span>
-
-                                    <span class="meta-item">
-
-                                        📞
-                                        ${escapeHTML(
-                                            service.phone
-                                        )}
-
-                                    </span>
-
-                                </div>
-
-                                <div style="
-                                    margin-top:12px;
-                                    color:#2563eb;
-                                    font-weight:bold;
-                                    font-size:14px;
-                                ">
-
-                                    👆 اضغط لعرض التفاصيل
-
-                                </div>
-
-                            </div>
-
-                        `;
-
-
-                        card.addEventListener(
-                            "click",
-                            () => {
-
-                                openServiceDetails(
-                                    service
-                                );
-
-                            }
-                        );
-
-
-                        servicesContainer.appendChild(
-                            card
-                        );
-
-                    }
-                );
-
-
-            if (count === 0) {
-
-                showEmptyServices();
-
-            }
+            renderServices(
+                allServices
+            );
 
         },
 
@@ -772,6 +652,381 @@ if (servicesContainer) {
 
 }
 
+
+/* =====================================
+   عرض الخدمات
+===================================== */
+
+function renderServices(
+    data,
+    categoryFilter = null
+) {
+
+    if (!servicesContainer)
+        return;
+
+
+    servicesContainer.innerHTML =
+        "";
+
+
+    let count =
+        0;
+
+
+    Object.entries(data)
+        .forEach(
+            ([id, service]) => {
+
+                if (
+                    !service ||
+                    service.status !==
+                    "approved"
+                ) {
+
+                    return;
+
+                }
+
+
+                /* فلترة القسم */
+
+                if (
+                    categoryFilter &&
+                    service.category !==
+                    categoryFilter
+                ) {
+
+                    return;
+
+                }
+
+
+                count++;
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "service-card";
+
+
+                card.dataset.serviceId =
+                    id;
+
+
+                card.innerHTML = `
+
+                    <div class="service-image">
+
+                        ${
+                            service.category === "craftsmen"
+                                ? "🔨"
+                                : service.category === "pharmacies"
+                                ? "💊"
+                                : service.category === "herbal"
+                                ? "🌿"
+                                : service.category === "shops"
+                                ? "🛒"
+                                : "🛠️"
+                        }
+
+                    </div>
+
+                    <div class="service-content">
+
+                        <h3>
+                            ${escapeHTML(
+                                service.name
+                            )}
+                        </h3>
+
+                        <p>
+                            ${escapeHTML(
+                                service.description
+                            )}
+                        </p>
+
+                        <div class="service-meta">
+
+                            <span class="meta-item">
+
+                                📍
+                                ${escapeHTML(
+                                    service.address
+                                )}
+
+                            </span>
+
+                            <span class="meta-item">
+
+                                📞
+                                ${escapeHTML(
+                                    service.phone
+                                )}
+
+                            </span>
+
+                        </div>
+
+                        <div style="
+                            margin-top:12px;
+                            color:#2563eb;
+                            font-weight:bold;
+                            font-size:14px;
+                        ">
+
+                            👆 اضغط لعرض التفاصيل
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                card.addEventListener(
+                    "click",
+                    () => {
+
+                        openServiceDetails(
+                            service
+                        );
+
+                    }
+                );
+
+
+                servicesContainer.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+    if (count === 0) {
+
+        showEmptyServices(
+            categoryFilter
+        );
+
+    }
+
+}
+
+
+/* =====================================
+   تشغيل أقسام الموقع
+===================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const categoryCards =
+            document.querySelectorAll(
+                ".category-card"
+            );
+
+
+        categoryCards.forEach(
+            (card) => {
+
+                card.addEventListener(
+                    "click",
+                    () => {
+
+                        const category =
+                            card.dataset.category;
+
+
+                        /* أرقام تهمك */
+
+                        if (
+                            category ===
+                            "important-numbers"
+                        ) {
+
+                            const section =
+                                document.getElementById(
+                                    "important-numbers"
+                                );
+
+
+                            if (section) {
+
+                                section.scrollIntoView({
+                                    behavior:
+                                        "smooth"
+                                });
+
+                            }
+
+                            return;
+
+                        }
+
+
+                        /* الإعلانات */
+
+                        if (
+                            category ===
+                            "ads"
+                        ) {
+
+                            const section =
+                                document.getElementById(
+                                    "ads"
+                                );
+
+
+                            if (section) {
+
+                                section.scrollIntoView({
+                                    behavior:
+                                        "smooth"
+                                });
+
+                            }
+
+                            return;
+
+                        }
+
+
+                        /* الخدمات والأقسام */
+
+                        if (
+                            category
+                        ) {
+
+                            renderServices(
+                                allServices,
+                                category
+                            );
+
+
+                            const section =
+                                document.getElementById(
+                                    "services"
+                                );
+
+
+                            if (section) {
+
+                                section.scrollIntoView({
+                                    behavior:
+                                        "smooth"
+                                });
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================
+   زر عرض كل الخدمات
+===================================== */
+
+function showAllServices() {
+
+    renderServices(
+        allServices
+    );
+
+}
+
+
+/* =====================================
+   رسالة عدم وجود خدمات
+===================================== */
+
+function showEmptyServices(
+    category = null
+) {
+
+    if (!servicesContainer)
+        return;
+
+
+    let message =
+        "لا توجد خدمات منشورة حاليًا";
+
+
+    if (
+        category ===
+        "craftsmen"
+    ) {
+
+        message =
+            "لا يوجد حرفيين منشورين حاليًا";
+
+    }
+
+    else if (
+        category ===
+        "pharmacies"
+    ) {
+
+        message =
+            "لا توجد صيدليات منشورة حاليًا";
+
+    }
+
+    else if (
+        category ===
+        "herbal"
+    ) {
+
+        message =
+            "لا توجد محلات عطارة منشورة حاليًا";
+
+    }
+
+    else if (
+        category ===
+        "shops"
+    ) {
+
+        message =
+            "لا توجد محلات منشورة حاليًا";
+
+    }
+
+
+    servicesContainer.innerHTML = `
+
+        <div class="empty-state">
+
+            <span>⏳</span>
+
+            <h3>
+                ${message}
+            </h3>
+
+            <p>
+                الخدمات الجديدة تظهر بعد موافقة الإدارة.
+            </p>
+
+        </div>
+
+    `;
+
+}
 
 /* =====================================
    تفاصيل الخدمة
