@@ -101,51 +101,6 @@
             line-height: 1.6;
         }
 
-        .info strong {
-            color: #222;
-        }
-
-        /* =====================================
-           بيانات مقدم طلب الخدمة
-        ===================================== */
-
-        .requester-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-right: 4px solid #2563eb;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-
-        .requester-title {
-            color: #2563eb;
-            font-weight: bold;
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-
-        .requester-info {
-            margin: 7px 0;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .requester-info strong {
-            color: #222;
-        }
-
-        .uid-box {
-            background: #f1f5f9;
-            padding: 8px 10px;
-            border-radius: 7px;
-            font-size: 12px;
-            word-break: break-all;
-            direction: ltr;
-            text-align: left;
-            margin-top: 8px;
-        }
-
         .actions {
             display: flex;
             gap: 10px;
@@ -295,15 +250,14 @@ import {
     getDatabase,
     ref,
     onValue,
-    update,
-    get
+    update
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
 const firebaseConfig = {
 
     apiKey:
-        "AIzaSyBpc-93tAPIRQyYlrpKGc_Yg8QqxuX8PfGI",
+        "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
 
     authDomain:
         "ahl-elbaled2.firebaseapp.com",
@@ -768,7 +722,7 @@ function loadServices() {
 
     onValue(
         servicesRef,
-        async (snapshot) => {
+        (snapshot) => {
 
             servicesContainer.innerHTML =
                 "";
@@ -787,47 +741,6 @@ function loadServices() {
             }
 
 
-            /* =====================================
-               تحميل بيانات المستخدمين
-            ===================================== */
-
-            let usersData =
-                {};
-
-
-            try {
-
-                const usersSnapshot =
-                    await get(
-                        ref(
-                            database,
-                            "users"
-                        )
-                    );
-
-
-                if (
-                    usersSnapshot.exists()
-                ) {
-
-                    usersData =
-                        usersSnapshot.val() ||
-                        {};
-
-                }
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Error loading users for services:",
-                    error
-                );
-
-            }
-
-
             let pendingCount =
                 0;
 
@@ -837,7 +750,6 @@ function loadServices() {
                     ([id, service]) => {
 
                         if (
-                            !service ||
                             service.status !==
                             "pending"
                         ) {
@@ -848,49 +760,6 @@ function loadServices() {
 
 
                         pendingCount++;
-
-
-                        /*
-                         * =====================================
-                         * معرفة صاحب طلب الخدمة
-                         * =====================================
-                         */
-
-                        const requester =
-                            service.userId &&
-                            usersData[service.userId]
-                                ? usersData[service.userId]
-                                : null;
-
-
-                        const requesterName =
-                            requester?.name ||
-                            service.userName ||
-                            "غير معروف";
-
-
-                        const requesterEmail =
-                            requester?.email ||
-                            service.userEmail ||
-                            "غير موجود";
-
-
-                        const requesterAccountNumber =
-                            requester?.accountNumber ||
-                            "غير محدد";
-
-
-                        const requesterUid =
-                            service.userId ||
-                            "غير موجود";
-
-
-                        const requestDate =
-                            service.createdAt
-                                ? formatDate(
-                                    service.createdAt
-                                )
-                                : "غير محدد";
 
 
                         const request =
@@ -915,97 +784,6 @@ function loadServices() {
 
                             </h3>
 
-
-                            <!-- =================================
-                                 بيانات مقدم طلب الخدمة
-                            ================================= -->
-
-                            <div class="requester-box">
-
-                                <div class="requester-title">
-
-                                    👤 مقدم طلب إضافة الخدمة
-
-                                </div>
-
-
-                                <div class="requester-info">
-
-                                    <strong>
-                                        اسم صاحب الطلب:
-                                    </strong>
-
-                                    ${escapeHTML(
-                                        requesterName
-                                    )}
-
-                                </div>
-
-
-                                <div class="requester-info">
-
-                                    <strong>
-                                        📧 البريد الإلكتروني:
-                                    </strong>
-
-                                    ${escapeHTML(
-                                        requesterEmail
-                                    )}
-
-                                </div>
-
-
-                                <div class="requester-info">
-
-                                    <strong>
-                                        🔢 رقم الحساب:
-                                    </strong>
-
-                                    ${escapeHTML(
-                                        String(
-                                            requesterAccountNumber
-                                        )
-                                    )}
-
-                                </div>
-
-
-                                <div class="requester-info">
-
-                                    <strong>
-                                        📅 تاريخ تقديم الطلب:
-                                    </strong>
-
-                                    ${escapeHTML(
-                                        requestDate
-                                    )}
-
-                                </div>
-
-
-                                <div class="requester-info">
-
-                                    <strong>
-                                        🆔 معرف الحساب:
-                                    </strong>
-
-                                    <div class="uid-box">
-
-                                        ${escapeHTML(
-                                            requesterUid
-                                        )}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- =================================
-                                 بيانات الخدمة
-                            ================================= -->
-
                             <div class="info">
 
                                 <strong>
@@ -1024,7 +802,6 @@ function loadServices() {
 
                             </div>
 
-
                             <div class="info">
 
                                 <strong>
@@ -1037,7 +814,6 @@ function loadServices() {
                                 )}
 
                             </div>
-
 
                             <div class="info">
 
@@ -1052,7 +828,6 @@ function loadServices() {
 
                             </div>
 
-
                             <div class="info">
 
                                 <strong>
@@ -1066,7 +841,6 @@ function loadServices() {
 
                             </div>
 
-
                             <div class="info">
 
                                 <strong>
@@ -1079,7 +853,6 @@ function loadServices() {
                                 )}
 
                             </div>
-
 
                             <div class="actions">
 
@@ -1169,7 +942,7 @@ function loadServices() {
 
                 <div class="empty">
 
-                    ❌ حدث خطأ في تحميل طلبات الخدمات
+                    ❌ حدث خطأ في تحميل الخدمات
 
                     <br><br>
 
@@ -1300,10 +1073,7 @@ function getCategoryName(
             "العطارة",
 
         shops:
-            "المحلات",
-
-        important-numbers:
-            "أرقام مهمة"
+            "المحلات"
 
     };
 
