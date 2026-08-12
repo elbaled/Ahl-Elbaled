@@ -180,6 +180,400 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+    authDomain:
+        "ahl-elbaled2.firebaseapp.com",
+
+    databaseURL:
+        "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+    projectId:
+        "ahl-elbaled2",
+
+    storageBucket:
+        "ahl-elbaled2.firebasestorage.app",
+
+    messagingSenderId:
+        "984455426367",
+
+    appId:
+        "1:984455426367:web:5420f680f2a4f9b609238a",
+
+    measurementId:
+        "G-NQFQWK5T57"
+
+};
+
+
+/* =========================
+   INITIALIZE FIREBASE
+========================= */
+
+const app =
+    initializeApp(firebaseConfig);
+
+const auth =
+    getAuth(app);
+
+const database =
+    getDatabase(app);
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const message =
+    document.getElementById("message");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+
+/* =========================
+   LOGIN
+========================= */
+
+loginForm.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        message.textContent =
+            "جاري تسجيل الدخول...";
+
+        loginButton.disabled =
+            true;
+
+
+        try {
+
+            /* =========================
+               FIREBASE AUTH
+            ========================= */
+
+            const result =
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+
+            const uid =
+                result.user.uid;
+
+
+            console.log(
+                "تم تسجيل الدخول Firebase"
+            );
+
+            console.log(
+                "UID:",
+                uid
+            );
+
+
+            /* =========================
+               READ USER DATA
+            ========================= */
+
+            const userPath =
+                "users/" + uid;
+
+
+            const userRef =
+                ref(
+                    database,
+                    userPath
+                );
+
+
+            console.log(
+                "Database URL:",
+                firebaseConfig.databaseURL
+            );
+
+
+            console.log(
+                "Reading path:",
+                userPath
+            );
+
+
+            const snapshot =
+                await get(userRef);
+
+
+            console.log(
+                "Data exists:",
+                snapshot.exists()
+            );
+
+
+            console.log(
+                "Data:",
+                snapshot.val()
+            );
+
+
+            /* =========================
+               USER NOT FOUND
+            ========================= */
+
+            if (!snapshot.exists()) {
+
+                message.textContent =
+                    "بيانات الحساب غير موجودة في النظام.";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            /* =========================
+               USER DATA
+            ========================= */
+
+            const userData =
+                snapshot.val();
+
+
+            /* =========================
+               PENDING
+            ========================= */
+
+            if (
+                userData.status === "pending"
+            ) {
+
+                message.textContent =
+                    "حسابك قيد المراجعة ⏳";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            /* =========================
+               REJECTED
+            ========================= */
+
+            if (
+                userData.status === "rejected"
+            ) {
+
+                message.textContent =
+                    "تم رفض طلب إنشاء الحساب ❌";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            /* =========================
+               NOT APPROVED
+            ========================= */
+
+            if (
+                userData.status !== "approved"
+            ) {
+
+                message.textContent =
+                    "لا يمكن الدخول بهذا الحساب حاليًا.";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            /* =========================
+               APPROVED
+            ========================= */
+
+            message.textContent =
+                "تم تسجيل الدخول بنجاح ✅";
+
+
+            console.log(
+                "الحساب معتمد"
+            );
+
+
+            console.log(
+                "Account Number:",
+                userData.accountNumber
+            );
+
+
+            console.log(
+                "Role:",
+                userData.role
+            );
+
+
+            /*
+             * مهم:
+             *
+             * الأدمن والمستخدم العادي
+             * يدخلان نفس الموقع.
+             *
+             * لن يتم تحويل الأدمن
+             * إلى admin.html.
+             */
+
+            setTimeout(
+                () => {
+
+                    window.location.href =
+                        "index.html";
+
+                },
+                700
+            );
+
+        }
+
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        catch (error) {
+
+            console.error(
+                "Firebase Login Error:",
+                error
+            );
+
+
+            console.error(
+                "Error Code:",
+                error.code
+            );
+
+
+            message.textContent =
+                "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+
+            loginButton.disabled =
+                false;
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
+    <h1>أهل البلد</h1>
+
+    <p class="subtitle">
+        تسجيل الدخول
+    </p>
+
+    <form id="loginForm">
+
+        <label for="email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            required
+            autocomplete="username"
+        >
+
+        <label for="password">
+            كلمة المرور
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="كلمة المرور"
+            required
+            autocomplete="current-password"
+        >
+
+        <button
+            type="submit"
+            id="loginButton">
+
+            دخول
+
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+    <a href="register.html" class="back">
+        📝 إنشاء حساب جديد
+    </a>
+
+    <a href="index.html" class="back">
+        ← العودة للموقع
+    </a>
+
+</div>
+
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+import {
+    getDatabase,
+    ref,
+    get
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+
 const firebaseConfig = {
 
     apiKey:
