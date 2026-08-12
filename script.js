@@ -1,5 +1,3 @@
-script.js
-
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -19,9 +17,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
-// ===============================
-// Firebase
-// ===============================
+/* =====================================
+   Firebase
+===================================== */
 
 const firebaseConfig = {
 
@@ -51,16 +49,19 @@ const firebaseConfig = {
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth =
+    getAuth(app);
 
-const database = getDatabase(app);
+const database =
+    getDatabase(app);
 
 
-// ===============================
-// عناصر الصفحة
-// ===============================
+/* =====================================
+   عناصر الصفحة
+===================================== */
 
 const modal =
     document.getElementById(
@@ -93,9 +94,9 @@ const servicesContainer =
     );
 
 
-// ===============================
-// عناصر نافذة التفاصيل
-// ===============================
+/* =====================================
+   نافذة التفاصيل
+===================================== */
 
 const detailsModal =
     document.getElementById(
@@ -158,26 +159,28 @@ const detailsCallButton =
     );
 
 
-// ===============================
-// حالة المستخدم
-// ===============================
+/* =====================================
+   حالة المستخدم
+===================================== */
 
 let currentUser = null;
 
 let currentUserData = null;
 
 
-// ===============================
-// التحقق من تسجيل الدخول
-// ===============================
+/* =====================================
+   تسجيل حالة المستخدم
+===================================== */
 
 onAuthStateChanged(
     auth,
     async (user) => {
 
-        currentUser = user;
+        currentUser =
+            user;
 
-        currentUserData = null;
+        currentUserData =
+            null;
 
 
         if (!user) {
@@ -187,13 +190,8 @@ onAuthStateChanged(
             );
 
             return;
+
         }
-
-
-        console.log(
-            "المستخدم مسجل:",
-            user.email
-        );
 
 
         try {
@@ -214,7 +212,6 @@ onAuthStateChanged(
                 currentUserData =
                     snapshot.val();
 
-
                 console.log(
                     "بيانات المستخدم:",
                     currentUserData
@@ -227,7 +224,7 @@ onAuthStateChanged(
         catch (error) {
 
             console.error(
-                "خطأ في قراءة بيانات المستخدم:",
+                "خطأ في قراءة المستخدم:",
                 error
             );
 
@@ -237,9 +234,9 @@ onAuthStateChanged(
 );
 
 
-// ===============================
-// فتح نافذة إضافة الخدمة
-// ===============================
+/* =====================================
+   فتح نافذة إضافة الخدمة
+===================================== */
 
 function openModal() {
 
@@ -253,6 +250,7 @@ function openModal() {
             "login.html";
 
         return;
+
     }
 
 
@@ -263,6 +261,7 @@ function openModal() {
         );
 
         return;
+
     }
 
 
@@ -276,20 +275,24 @@ function openModal() {
         );
 
         return;
+
     }
 
 
     if (!modal) {
 
         alert(
-            "خطأ: نافذة إضافة الخدمة غير موجودة."
+            "نافذة إضافة الخدمة غير موجودة."
         );
 
         return;
+
     }
 
 
-    modal.classList.add("active");
+    modal.classList.add(
+        "active"
+    );
 
     modal.setAttribute(
         "aria-hidden",
@@ -298,16 +301,19 @@ function openModal() {
 
     document.body.style.overflow =
         "hidden";
+
 }
 
 
-// ===============================
-// إغلاق نافذة الإضافة
-// ===============================
+/* =====================================
+   إغلاق نافذة الإضافة
+===================================== */
 
 function closeModal() {
 
-    if (!modal) return;
+    if (!modal)
+        return;
+
 
     modal.classList.remove(
         "active"
@@ -324,9 +330,9 @@ function closeModal() {
 }
 
 
-// ===============================
-// أزرار إضافة الخدمة
-// ===============================
+/* =====================================
+   الأزرار
+===================================== */
 
 if (heroButton) {
 
@@ -378,9 +384,9 @@ if (modal) {
 }
 
 
-// ===============================
-// إرسال الخدمة
-// ===============================
+/* =====================================
+   إرسال الخدمة
+===================================== */
 
 if (form) {
 
@@ -398,6 +404,7 @@ if (form) {
                 );
 
                 return;
+
             }
 
 
@@ -412,6 +419,7 @@ if (form) {
                 );
 
                 return;
+
             }
 
 
@@ -481,6 +489,7 @@ if (form) {
                 );
 
                 return;
+
             }
 
 
@@ -547,7 +556,6 @@ if (form) {
 
                 closeModal();
 
-
             }
 
             catch (error) {
@@ -559,7 +567,7 @@ if (form) {
 
 
                 alert(
-                    "حدث خطأ أثناء إرسال الخدمة: " +
+                    "حدث خطأ أثناء إرسال الخدمة:\n" +
                     error.message
                 );
 
@@ -571,9 +579,9 @@ if (form) {
 }
 
 
-// ===============================
-// عرض الخدمات المقبولة
-// ===============================
+/* =====================================
+   عرض الخدمات المقبولة
+===================================== */
 
 if (servicesContainer) {
 
@@ -585,7 +593,9 @@ if (servicesContainer) {
 
 
     onValue(
+
         servicesRef,
+
         (snapshot) => {
 
             servicesContainer.innerHTML =
@@ -601,10 +611,12 @@ if (servicesContainer) {
                 showEmptyServices();
 
                 return;
+
             }
 
 
-            let count = 0;
+            let count =
+                0;
 
 
             Object.entries(data)
@@ -617,6 +629,7 @@ if (servicesContainer) {
                         ) {
 
                             return;
+
                         }
 
 
@@ -632,11 +645,6 @@ if (servicesContainer) {
                         card.className =
                             "service-card";
 
-
-                        /*
-                         * تخزين بيانات الخدمة
-                         * داخل الكارت
-                         */
 
                         card.dataset.serviceId =
                             id;
@@ -669,7 +677,6 @@ if (servicesContainer) {
                                     <span class="meta-item">
 
                                         📍
-
                                         ${escapeHTML(
                                             service.address
                                         )}
@@ -679,7 +686,6 @@ if (servicesContainer) {
                                     <span class="meta-item">
 
                                         📞
-
                                         ${escapeHTML(
                                             service.phone
                                         )}
@@ -703,10 +709,6 @@ if (servicesContainer) {
 
                         `;
 
-
-                        /*
-                         * الضغط على الخدمة
-                         */
 
                         card.addEventListener(
                             "click",
@@ -743,6 +745,7 @@ if (servicesContainer) {
                 error
             );
 
+
             servicesContainer.innerHTML = `
 
                 <div class="empty-state">
@@ -754,7 +757,9 @@ if (servicesContainer) {
                     </h3>
 
                     <p>
-                        حاول تحديث الصفحة.
+                        ${escapeHTML(
+                            error.message
+                        )}
                     </p>
 
                 </div>
@@ -762,41 +767,26 @@ if (servicesContainer) {
             `;
 
         }
+
     );
 
 }
 
 
-// ===============================
-// فتح تفاصيل الخدمة
-// ===============================
+/* =====================================
+   تفاصيل الخدمة
+===================================== */
 
-function openServiceDetails(
-    service
-) {
+function openServiceDetails(service) {
 
-    if (!detailsModal) {
-
-        console.error(
-            "نافذة تفاصيل الخدمة غير موجودة."
-        );
-
+    if (!detailsModal)
         return;
-    }
 
-
-    /*
-     * الاسم
-     */
 
     detailsName.textContent =
         service.name ||
         "خدمة بدون اسم";
 
-
-    /*
-     * القسم
-     */
 
     detailsCategory.textContent =
         getCategoryName(
@@ -804,51 +794,30 @@ function openServiceDetails(
         );
 
 
-    /*
-     * الوصف
-     */
-
     detailsDescription.textContent =
         service.description ||
         "لا يوجد وصف للخدمة.";
 
-
-    /*
-     * العنوان
-     */
 
     detailsAddress.textContent =
         service.address ||
         "لم يتم تحديد العنوان";
 
 
-    /*
-     * الهاتف
-     */
-
     detailsPhone.textContent =
         service.phone ||
         "لم يتم إضافة رقم الهاتف";
 
-
-    /*
-     * مواعيد العمل
-     */
 
     detailsWorkingHours.textContent =
         service.workingHours ||
         "لم يتم تحديد مواعيد العمل";
 
 
-    /*
-     * زر الاتصال
-     */
-
     if (service.phone) {
 
         detailsCallButton.href =
-            "tel:" +
-            service.phone;
+            "tel:" + service.phone;
 
         detailsCallButton.style.display =
             "block";
@@ -863,18 +832,9 @@ function openServiceDetails(
     }
 
 
-    /*
-     * الصورة الرئيسية
-     */
-
     detailsImage.innerHTML =
         "🏪";
 
-
-    /*
-     * لو أضفنا صورة لاحقًا
-     * باستخدام image أو imageUrl
-     */
 
     if (service.imageUrl) {
 
@@ -883,11 +843,14 @@ function openServiceDetails(
                 "img"
             );
 
+
         image.src =
             service.imageUrl;
 
         image.alt =
-            service.name || "صورة الخدمة";
+            service.name ||
+            "صورة الخدمة";
+
 
         image.onerror =
             () => {
@@ -908,10 +871,6 @@ function openServiceDetails(
     }
 
 
-    /*
-     * معرض الصور
-     */
-
     detailsGallery.innerHTML =
         "";
 
@@ -925,7 +884,8 @@ function openServiceDetails(
         service.images.forEach(
             (imageUrl) => {
 
-                if (!imageUrl) return;
+                if (!imageUrl)
+                    return;
 
 
                 const image =
@@ -936,7 +896,6 @@ function openServiceDetails(
 
                 image.src =
                     imageUrl;
-
 
                 image.alt =
                     service.name ||
@@ -984,20 +943,14 @@ function openServiceDetails(
     }
 
 
-    /*
-     * إظهار النافذة
-     */
-
     detailsModal.classList.add(
         "active"
     );
-
 
     detailsModal.setAttribute(
         "aria-hidden",
         "false"
     );
-
 
     document.body.style.overflow =
         "hidden";
@@ -1005,25 +958,24 @@ function openServiceDetails(
 }
 
 
-// ===============================
-// إغلاق تفاصيل الخدمة
-// ===============================
+/* =====================================
+   إغلاق التفاصيل
+===================================== */
 
 function closeServiceDetails() {
 
-    if (!detailsModal) return;
+    if (!detailsModal)
+        return;
 
 
     detailsModal.classList.remove(
         "active"
     );
 
-
     detailsModal.setAttribute(
         "aria-hidden",
         "true"
     );
-
 
     document.body.style.overflow =
         "";
@@ -1051,17 +1003,11 @@ if (detailsOverlay) {
 }
 
 
-// ===============================
-// زر ESC لإغلاق النافذة
-// ===============================
-
 document.addEventListener(
     "keydown",
     (event) => {
 
-        if (
-            event.key === "Escape"
-        ) {
+        if (event.key === "Escape") {
 
             closeServiceDetails();
 
@@ -1073,13 +1019,11 @@ document.addEventListener(
 );
 
 
-// ===============================
-// أسماء الأقسام
-// ===============================
+/* =====================================
+   أسماء الأقسام
+===================================== */
 
-function getCategoryName(
-    category
-) {
+function getCategoryName(category) {
 
     const categories = {
 
@@ -1107,9 +1051,9 @@ function getCategoryName(
 }
 
 
-// ===============================
-// رسالة عدم وجود خدمات
-// ===============================
+/* =====================================
+   لا توجد خدمات
+===================================== */
 
 function showEmptyServices() {
 
@@ -1138,13 +1082,11 @@ function showEmptyServices() {
 }
 
 
-// ===============================
-// حماية HTML
-// ===============================
+/* =====================================
+   حماية HTML
+===================================== */
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     const div =
         document.createElement(
