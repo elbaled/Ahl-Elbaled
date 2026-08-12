@@ -13,7 +13,8 @@ import {
     push,
     set,
     onValue,
-    get
+    get,
+    remove
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
@@ -60,7 +61,7 @@ const database =
 
 
 /* =====================================
-   عناصر الصفحة
+   عناصر إضافة الخدمة
 ===================================== */
 
 const modal =
@@ -95,7 +96,7 @@ const servicesContainer =
 
 
 /* =====================================
-   نافذة التفاصيل
+   نافذة تفاصيل الخدمة
 ===================================== */
 
 const detailsModal =
@@ -160,16 +161,47 @@ const detailsCallButton =
 
 
 /* =====================================
-   حالة المستخدم
+   زر حذف الخدمة
 ===================================== */
 
-let currentUser = null;
-
-let currentUserData = null;
+const detailsDeleteButton =
+    document.getElementById(
+        "detailsDeleteButton"
+    );
 
 
 /* =====================================
-   تسجيل حالة المستخدم
+   حالة المستخدم
+===================================== */
+
+let currentUser =
+    null;
+
+let currentUserData =
+    null;
+
+
+/* =====================================
+   الخدمة المفتوحة حاليًا
+===================================== */
+
+let currentService =
+    null;
+
+let currentServiceId =
+    null;
+
+
+/* =====================================
+   جميع الخدمات
+===================================== */
+
+let allServices =
+    {};
+
+
+/* =====================================
+   حالة تسجيل الدخول
 ===================================== */
 
 onAuthStateChanged(
@@ -212,6 +244,7 @@ onAuthStateChanged(
                 currentUserData =
                     snapshot.val();
 
+
                 console.log(
                     "بيانات المستخدم:",
                     currentUserData
@@ -232,6 +265,25 @@ onAuthStateChanged(
 
     }
 );
+
+
+/* =====================================
+   معرفة هل المستخدم أدمن
+===================================== */
+
+function isAdmin() {
+
+    if (!currentUserData)
+        return false;
+
+
+    return (
+        currentUserData.role === "admin" ||
+        currentUserData.isAdmin === true ||
+        currentUserData.type === "admin"
+    );
+
+}
 
 
 /* =====================================
@@ -306,7 +358,7 @@ function openModal() {
 
 
 /* =====================================
-   إغلاق نافذة الإضافة
+   إغلاق نافذة إضافة الخدمة
 ===================================== */
 
 function closeModal() {
@@ -331,7 +383,7 @@ function closeModal() {
 
 
 /* =====================================
-   الأزرار
+   أزرار إضافة الخدمة
 ===================================== */
 
 if (heroButton) {
@@ -385,7 +437,7 @@ if (modal) {
 
 
 /* =====================================
-   إرسال الخدمة
+   إضافة خدمة جديدة
 ===================================== */
 
 if (form) {
@@ -428,7 +480,7 @@ if (form) {
                     .getElementById(
                         "serviceName"
                     )
-                    .value
+                    ?.value
                     .trim();
 
 
@@ -437,7 +489,7 @@ if (form) {
                     .getElementById(
                         "serviceCategory"
                     )
-                    .value;
+                    ?.value;
 
 
             const description =
@@ -445,7 +497,7 @@ if (form) {
                     .getElementById(
                         "serviceDescription"
                     )
-                    .value
+                    ?.value
                     .trim();
 
 
@@ -454,7 +506,7 @@ if (form) {
                     .getElementById(
                         "servicePhone"
                     )
-                    .value
+                    ?.value
                     .trim();
 
 
@@ -463,7 +515,7 @@ if (form) {
                     .getElementById(
                         "serviceAddress"
                     )
-                    .value
+                    ?.value
                     .trim();
 
 
@@ -472,7 +524,7 @@ if (form) {
                     .getElementById(
                         "serviceWorkingHours"
                     )
-                    .value
+                    ?.value
                     .trim();
 
 
@@ -580,18 +632,7 @@ if (form) {
 
 
 /* =====================================
-   عرض الخدمات المقبولة
-===================================== */
-
-/* =====================================
-   بيانات وفلترة الخدمات
-===================================== */
-
-let allServices = {};
-
-
-/* =====================================
-   تحميل الخدمات
+   تحميل الخدمات من Firebase
 ===================================== */
 
 if (servicesContainer) {
@@ -611,6 +652,7 @@ if (servicesContainer) {
 
             allServices =
                 snapshot.val() || {};
+
 
             renderServices(
                 allServices
@@ -654,6 +696,36 @@ if (servicesContainer) {
 
 
 /* =====================================
+   أيقونة القسم
+===================================== */
+
+function getCategoryIcon(
+    category
+) {
+
+    switch (category) {
+
+        case "pharmacies":
+            return "💊";
+
+        case "herbal":
+            return "🌿";
+
+        case "shops":
+            return "🛒";
+
+        case "services":
+            return "🛠️";
+
+        default:
+            return "🏪";
+
+    }
+
+}
+
+
+/* =====================================
    عرض الخدمات
 ===================================== */
 
@@ -678,8 +750,11 @@ function renderServices(
         .forEach(
             ([id, service]) => {
 
+                if (!service)
+                    return;
+
+
                 if (
-                    !service ||
                     service.status !==
                     "approved"
                 ) {
@@ -688,8 +763,6 @@ function renderServices(
 
                 }
 
-
-                /* فلترة القسم */
 
                 if (
                     categoryFilter &&
@@ -723,17 +796,9 @@ function renderServices(
 
                     <div class="service-image">
 
-                        ${
-                            service.category === "craftsmen"
-                                ? "🔨"
-                                : service.category === "pharmacies"
-                                ? "💊"
-                                : service.category === "herbal"
-                                ? "🌿"
-                                : service.category === "shops"
-                                ? "🛒"
-                                : "🛠️"
-                        }
+                        ${getCategoryIcon(
+                            service.category
+                        )}
 
                     </div>
 
@@ -794,7 +859,8 @@ function renderServices(
                     () => {
 
                         openServiceDetails(
-                            service
+                            service,
+                            id
                         );
 
                     }
@@ -845,7 +911,7 @@ document.addEventListener(
                             card.dataset.category;
 
 
-                        /* أرقام تهمك */
+                        /* أرقام مهمة */
 
                         if (
                             category ===
@@ -899,7 +965,7 @@ document.addEventListener(
                         }
 
 
-                        /* الخدمات والأقسام */
+                        /* الخدمات */
 
                         if (
                             category
@@ -939,7 +1005,7 @@ document.addEventListener(
 
 
 /* =====================================
-   زر عرض كل الخدمات
+   عرض كل الخدمات
 ===================================== */
 
 function showAllServices() {
@@ -969,16 +1035,6 @@ function showEmptyServices(
 
     if (
         category ===
-        "craftsmen"
-    ) {
-
-        message =
-            "لا يوجد حرفيين منشورين حاليًا";
-
-    }
-
-    else if (
-        category ===
         "pharmacies"
     ) {
 
@@ -1007,6 +1063,16 @@ function showEmptyServices(
 
     }
 
+    else if (
+        category ===
+        "services"
+    ) {
+
+        message =
+            "لا توجد خدمات منشورة حاليًا";
+
+    }
+
 
     servicesContainer.innerHTML = `
 
@@ -1028,48 +1094,88 @@ function showEmptyServices(
 
 }
 
+
 /* =====================================
-   تفاصيل الخدمة
+   فتح تفاصيل الخدمة
 ===================================== */
 
-function openServiceDetails(service) {
+function openServiceDetails(
+    service,
+    serviceId
+) {
 
     if (!detailsModal)
         return;
 
 
-    detailsName.textContent =
-        service.name ||
-        "خدمة بدون اسم";
+    currentService =
+        service;
+
+    currentServiceId =
+        serviceId;
 
 
-    detailsCategory.textContent =
-        getCategoryName(
-            service.category
-        );
+    if (detailsName) {
+
+        detailsName.textContent =
+            service.name ||
+            "خدمة بدون اسم";
+
+    }
 
 
-    detailsDescription.textContent =
-        service.description ||
-        "لا يوجد وصف للخدمة.";
+    if (detailsCategory) {
+
+        detailsCategory.textContent =
+            getCategoryName(
+                service.category
+            );
+
+    }
 
 
-    detailsAddress.textContent =
-        service.address ||
-        "لم يتم تحديد العنوان";
+    if (detailsDescription) {
+
+        detailsDescription.textContent =
+            service.description ||
+            "لا يوجد وصف للخدمة.";
+
+    }
 
 
-    detailsPhone.textContent =
-        service.phone ||
-        "لم يتم إضافة رقم الهاتف";
+    if (detailsAddress) {
+
+        detailsAddress.textContent =
+            service.address ||
+            "لم يتم تحديد العنوان";
+
+    }
 
 
-    detailsWorkingHours.textContent =
-        service.workingHours ||
-        "لم يتم تحديد مواعيد العمل";
+    if (detailsPhone) {
+
+        detailsPhone.textContent =
+            service.phone ||
+            "لم يتم إضافة رقم الهاتف";
+
+    }
 
 
-    if (service.phone) {
+    if (detailsWorkingHours) {
+
+        detailsWorkingHours.textContent =
+            service.workingHours ||
+            "لم يتم تحديد مواعيد العمل";
+
+    }
+
+
+    /* زر الاتصال */
+
+    if (
+        detailsCallButton &&
+        service.phone
+    ) {
 
         detailsCallButton.href =
             "tel:" + service.phone;
@@ -1079,7 +1185,7 @@ function openServiceDetails(service) {
 
     }
 
-    else {
+    else if (detailsCallButton) {
 
         detailsCallButton.style.display =
             "none";
@@ -1087,125 +1193,183 @@ function openServiceDetails(service) {
     }
 
 
-    detailsImage.innerHTML =
-        "🏪";
+    /* الصورة الأساسية */
 
-
-    if (service.imageUrl) {
-
-        const image =
-            document.createElement(
-                "img"
-            );
-
-
-        image.src =
-            service.imageUrl;
-
-        image.alt =
-            service.name ||
-            "صورة الخدمة";
-
-
-        image.onerror =
-            () => {
-
-                detailsImage.innerHTML =
-                    "🏪";
-
-            };
-
+    if (detailsImage) {
 
         detailsImage.innerHTML =
-            "";
-
-        detailsImage.appendChild(
-            image
-        );
-
-    }
-
-
-    detailsGallery.innerHTML =
-        "";
-
-
-    if (
-        service.images &&
-        Array.isArray(service.images) &&
-        service.images.length > 0
-    ) {
-
-        service.images.forEach(
-            (imageUrl) => {
-
-                if (!imageUrl)
-                    return;
-
-
-                const image =
-                    document.createElement(
-                        "img"
-                    );
-
-
-                image.src =
-                    imageUrl;
-
-                image.alt =
-                    service.name ||
-                    "صورة الخدمة";
-
-
-                image.onerror =
-                    () => {
-
-                        image.style.display =
-                            "none";
-
-                    };
-
-
-                detailsGallery.appendChild(
-                    image
-                );
-
-            }
-        );
-
-    }
-
-    else {
-
-        const empty =
-            document.createElement(
-                "div"
+            getCategoryIcon(
+                service.category
             );
 
 
-        empty.className =
-            "service-gallery-empty";
+        if (service.imageUrl) {
+
+            const image =
+                document.createElement(
+                    "img"
+                );
 
 
-        empty.textContent =
-            "🖼️ لا توجد صور مضافة حاليًا";
+            image.src =
+                service.imageUrl;
 
 
-        detailsGallery.appendChild(
-            empty
-        );
+            image.alt =
+                service.name ||
+                "صورة الخدمة";
+
+
+            image.onerror =
+                () => {
+
+                    detailsImage.innerHTML =
+                        getCategoryIcon(
+                            service.category
+                        );
+
+                };
+
+
+            detailsImage.innerHTML =
+                "";
+
+
+            detailsImage.appendChild(
+                image
+            );
+
+        }
 
     }
 
+
+    /* معرض الصور */
+
+    if (detailsGallery) {
+
+        detailsGallery.innerHTML =
+            "";
+
+
+        if (
+            service.images &&
+            Array.isArray(service.images) &&
+            service.images.length > 0
+        ) {
+
+            service.images.forEach(
+                (imageUrl) => {
+
+                    if (!imageUrl)
+                        return;
+
+
+                    const image =
+                        document.createElement(
+                            "img"
+                        );
+
+
+                    image.src =
+                        imageUrl;
+
+
+                    image.alt =
+                        service.name ||
+                        "صورة الخدمة";
+
+
+                    image.onerror =
+                        () => {
+
+                            image.style.display =
+                                "none";
+
+                        };
+
+
+                    detailsGallery.appendChild(
+                        image
+                    );
+
+                }
+            );
+
+        }
+
+        else {
+
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+
+            empty.className =
+                "service-gallery-empty";
+
+
+            empty.textContent =
+                "🖼️ لا توجد صور مضافة حاليًا";
+
+
+            detailsGallery.appendChild(
+                empty
+            );
+
+        }
+
+    }
+
+
+    /* =====================================
+       زر الحذف
+    ===================================== */
+
+    if (detailsDeleteButton) {
+
+        detailsDeleteButton.style.display =
+            "none";
+
+
+        /*
+         * الأدمن يستطيع حذف أي خدمة
+         *
+         * صاحب الخدمة يستطيع حذف خدمته
+         */
+
+        const isOwner =
+            currentUser &&
+            service.userId ===
+            currentUser.uid;
+
+
+        if (
+            isAdmin() ||
+            isOwner
+        ) {
+
+            detailsDeleteButton.style.display =
+                "block";
+
+        }
+
+    }
+
+
+    /* فتح النافذة */
 
     detailsModal.classList.add(
         "active"
     );
 
+
     detailsModal.setAttribute(
         "aria-hidden",
         "false"
     );
+
 
     document.body.style.overflow =
         "hidden";
@@ -1214,7 +1378,139 @@ function openServiceDetails(service) {
 
 
 /* =====================================
-   إغلاق التفاصيل
+   حذف الخدمة
+===================================== */
+
+async function deleteCurrentService() {
+
+    if (
+        !currentService ||
+        !currentServiceId
+    ) {
+
+        alert(
+            "لم يتم تحديد الخدمة."
+        );
+
+        return;
+
+    }
+
+
+    if (!currentUser) {
+
+        alert(
+            "يجب تسجيل الدخول أولًا."
+        );
+
+        return;
+
+    }
+
+
+    const isOwner =
+        currentService.userId ===
+        currentUser.uid;
+
+
+    if (
+        !isAdmin() &&
+        !isOwner
+    ) {
+
+        alert(
+            "ليس لديك صلاحية حذف هذه الخدمة."
+        );
+
+        return;
+
+    }
+
+
+    const confirmDelete =
+        confirm(
+            "هل أنت متأكد أنك تريد حذف هذه الخدمة نهائيًا؟"
+        );
+
+
+    if (!confirmDelete)
+        return;
+
+
+    try {
+
+        const serviceRef =
+            ref(
+                database,
+                "services/" +
+                currentServiceId
+            );
+
+
+        await remove(
+            serviceRef
+        );
+
+
+        alert(
+            "تم حذف الخدمة بنجاح ✅"
+        );
+
+
+        currentService =
+            null;
+
+        currentServiceId =
+            null;
+
+
+        closeServiceDetails();
+
+
+        /*
+         * إعادة عرض الخدمات
+         */
+
+        renderServices(
+            allServices
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Delete service error:",
+            error
+        );
+
+
+        alert(
+            "حدث خطأ أثناء حذف الخدمة:\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================
+   زر حذف الخدمة
+===================================== */
+
+if (detailsDeleteButton) {
+
+    detailsDeleteButton.addEventListener(
+        "click",
+        deleteCurrentService
+    );
+
+}
+
+
+/* =====================================
+   إغلاق تفاصيل الخدمة
 ===================================== */
 
 function closeServiceDetails() {
@@ -1227,13 +1523,22 @@ function closeServiceDetails() {
         "active"
     );
 
+
     detailsModal.setAttribute(
         "aria-hidden",
         "true"
     );
 
+
     document.body.style.overflow =
         "";
+
+
+    currentService =
+        null;
+
+    currentServiceId =
+        null;
 
 }
 
@@ -1258,6 +1563,10 @@ if (detailsOverlay) {
 }
 
 
+/* =====================================
+   زر Escape
+===================================== */
+
 document.addEventListener(
     "keydown",
     (event) => {
@@ -1278,15 +1587,14 @@ document.addEventListener(
    أسماء الأقسام
 ===================================== */
 
-function getCategoryName(category) {
+function getCategoryName(
+    category
+) {
 
     const categories = {
 
         services:
             "🛠️ الخدمات",
-
-        craftsmen:
-            "🔨 الحرفيين",
 
         pharmacies:
             "💊 الصيدليات",
@@ -1310,41 +1618,12 @@ function getCategoryName(category) {
 
 
 /* =====================================
-   لا توجد خدمات
-===================================== */
-
-function showEmptyServices() {
-
-    if (!servicesContainer)
-        return;
-
-
-    servicesContainer.innerHTML = `
-
-        <div class="empty-state">
-
-            <span>⏳</span>
-
-            <h3>
-                لا توجد خدمات منشورة حاليًا
-            </h3>
-
-            <p>
-                الخدمات الجديدة تظهر بعد موافقة الإدارة.
-            </p>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =====================================
    حماية HTML
 ===================================== */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     const div =
         document.createElement(
@@ -1360,6 +1639,10 @@ function escapeHTML(value) {
 
 }
 
+
+/* =====================================
+   تشغيل
+===================================== */
 
 console.log(
     "أهل البلد - script.js يعمل بنجاح ✅"
