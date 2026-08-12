@@ -1,18 +1,27 @@
+script.js — أهل البلد
+
 import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 import {
   getDatabase,
   ref,
   push,
   set,
+  get,
   onValue
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
 // ==========================================
-// Firebase Configuration
+// Firebase
 // ==========================================
 
 const firebaseConfig = {
@@ -27,11 +36,9 @@ const firebaseConfig = {
 };
 
 
-// ==========================================
-// Initialize Firebase
-// ==========================================
-
 const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
 
 const database = getDatabase(app);
 
@@ -58,6 +65,191 @@ const addServiceModal =
 const closeModalBtn =
   document.getElementById("closeModalBtn");
 
+const loginBtn =
+  document.getElementById("loginBtn");
+
+
+// ==========================================
+// بيانات المستخدم الحالي
+// ==========================================
+
+let currentUser = null;
+
+let currentUserData = null;
+
+
+// ==========================================
+// التحقق من تسجيل الدخول
+// ==========================================
+
+onAuthStateChanged(
+  auth,
+  async (user) => {
+
+    currentUser = user;
+
+    currentUserData = null;
+
+
+    // ========================================
+    // المستخدم غير مسجل
+    // ========================================
+
+    if (!user) {
+
+      if (loginBtn) {
+
+        loginBtn.innerHTML = "👤 دخول";
+
+        loginBtn.href = "login.html";
+
+      }
+
+      return;
+    }
+
+
+    // ========================================
+    // جلب بيانات المستخدم
+    // ========================================
+
+    try {
+
+      const userRef =
+        ref(
+          database,
+          "users/" + user.uid
+        );
+
+
+      const snapshot =
+        await get(userRef);
+
+
+      if (snapshot.exists()) {
+
+        currentUserData =
+          snapshot.val();
+
+      }
+
+
+      // ======================================
+      // عرض اسم المستخدم
+      // ======================================
+
+      if (loginBtn) {
+
+        const name =
+          currentUserData?.name ||
+          user.displayName ||
+          "حسابي";
+
+
+        loginBtn.innerHTML =
+          "👤 " + escapeHTML(name);
+
+
+        loginBtn.href =
+          "#";
+
+        loginBtn.onclick =
+          (event) => {
+
+            event.preventDefault();
+
+            alert(
+              "أهلاً بيك " +
+              name +
+              " 👋"
+            );
+
+          };
+
+      }
+
+
+      // ======================================
+      // إذا كان أدمن
+      // ======================================
+
+      if (
+        currentUserData &&
+        currentUserData.role === "admin" &&
+        currentUserData.status === "approved"
+      ) {
+
+        createAdminButton();
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "خطأ في قراءة بيانات المستخدم:",
+        error
+      );
+
+    }
+
+  }
+);
+
+
+// ==========================================
+// إنشاء زر الإدارة للأدمن
+// ==========================================
+
+function createAdminButton() {
+
+  const headerActions =
+    document.querySelector(
+      ".header-actions"
+    );
+
+
+  if (!headerActions) return;
+
+
+  // منع تكرار الزر
+
+  if (
+    document.getElementById(
+      "adminPanelBtn"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const adminButton =
+    document.createElement("a");
+
+
+  adminButton.id =
+    "adminPanelBtn";
+
+
+  adminButton.href =
+    "admin.html";
+
+
+  adminButton.className =
+    "login-btn";
+
+
+  adminButton.innerHTML =
+    "⚙️ لوحة الإدارة";
+
+
+  headerActions.appendChild(
+    adminButton
+  );
+
+}
+
 
 // ==========================================
 // فتح نافذة إضافة الخدمة
@@ -67,34 +259,83 @@ function openModal() {
 
   if (!addServiceModal) return;
 
-  addServiceModal.classList.add("active");
+
+  // ========================================
+  // لازم يكون المستخدم مسجل دخول
+  // ========================================
+
+  if (!currentUser) {
+
+    alert(
+      "لازم تعمل حساب وتسجل الدخول أولًا لإضافة خدمة 🔐"
+    );
+
+
+    window.location.href =
+      "login.html";
+
+
+    return;
+
+  }
+
+
+  // ========================================
+  // التأكد أن الحساب معتمد
+  // ========================================
+
+  if (
+    currentUserData &&
+    currentUserData.status !== "approved"
+  ) {
+
+    alert(
+      "حسابك لم تتم الموافقة عليه بعد ⏳"
+    );
+
+
+    return;
+
+  }
+
+
+  addServiceModal.classList.add(
+    "active"
+  );
+
 
   addServiceModal.setAttribute(
     "aria-hidden",
     "false"
   );
+
 }
 
 
 // ==========================================
-// إغلاق نافذة إضافة الخدمة
+// إغلاق النافذة
 // ==========================================
 
 function closeModal() {
 
   if (!addServiceModal) return;
 
-  addServiceModal.classList.remove("active");
+
+  addServiceModal.classList.remove(
+    "active"
+  );
+
 
   addServiceModal.setAttribute(
     "aria-hidden",
     "true"
   );
+
 }
 
 
 // ==========================================
-// زر أضف خدمتك
+// أزرار إضافة الخدمة
 // ==========================================
 
 if (addServiceHeroBtn) {
@@ -107,10 +348,6 @@ if (addServiceHeroBtn) {
 }
 
 
-// ==========================================
-// زر إضافة الآن
-// ==========================================
-
 if (addServiceBtn) {
 
   addServiceBtn.addEventListener(
@@ -120,10 +357,6 @@ if (addServiceBtn) {
 
 }
 
-
-// ==========================================
-// زر إغلاق النافذة
-// ==========================================
 
 if (closeModalBtn) {
 
@@ -136,7 +369,7 @@ if (closeModalBtn) {
 
 
 // ==========================================
-// الضغط على الخلفية لإغلاق النافذة
+// إغلاق عند الضغط على الخلفية
 // ==========================================
 
 if (addServiceModal) {
@@ -145,6 +378,7 @@ if (addServiceModal) {
     addServiceModal.querySelector(
       ".modal-overlay"
     );
+
 
   if (overlay) {
 
@@ -159,7 +393,7 @@ if (addServiceModal) {
 
 
 // ==========================================
-// إضافة خدمة إلى Firebase
+// إضافة خدمة
 // ==========================================
 
 if (form) {
@@ -169,6 +403,42 @@ if (form) {
     async (event) => {
 
       event.preventDefault();
+
+
+      // ======================================
+      // التأكد من تسجيل الدخول
+      // ======================================
+
+      if (!currentUser) {
+
+        alert(
+          "لازم تعمل حساب وتسجل الدخول أولًا."
+        );
+
+        window.location.href =
+          "login.html";
+
+        return;
+
+      }
+
+
+      // ======================================
+      // التأكد من موافقة الحساب
+      // ======================================
+
+      if (
+        !currentUserData ||
+        currentUserData.status !== "approved"
+      ) {
+
+        alert(
+          "حسابك لم تتم الموافقة عليه من الإدارة بعد ⏳"
+        );
+
+        return;
+
+      }
 
 
       const name =
@@ -205,8 +475,6 @@ if (form) {
           .trim();
 
 
-      // التأكد من البيانات
-
       if (
         !name ||
         !category ||
@@ -220,6 +488,7 @@ if (form) {
         );
 
         return;
+
       }
 
 
@@ -240,26 +509,39 @@ if (form) {
           newService,
           {
 
-            name: name,
+            name:
+              name,
 
-            category: category,
+            category:
+              category,
 
-            description: description,
+            description:
+              description,
 
-            phone: phone,
+            phone:
+              phone,
 
-            address: address,
+            address:
+              address,
 
-            status: "pending",
+            status:
+              "pending",
 
-            createdAt: Date.now()
+            userId:
+              currentUser.uid,
+
+            accountNumber:
+              currentUserData.accountNumber || null,
+
+            createdAt:
+              Date.now()
 
           }
         );
 
 
         alert(
-          "تم إرسال طلبك للمراجعة بنجاح ✅"
+          "تم إرسال الخدمة للمراجعة بنجاح ✅"
         );
 
 
@@ -272,8 +554,9 @@ if (form) {
 
         console.error(error);
 
+
         alert(
-          "حدث خطأ أثناء إرسال البيانات."
+          "حدث خطأ أثناء إرسال الخدمة."
         );
 
       }
@@ -285,7 +568,7 @@ if (form) {
 
 
 // ==========================================
-// عرض الخدمات المقبولة فقط
+// عرض الخدمات المقبولة
 // ==========================================
 
 const servicesRef =
@@ -302,7 +585,8 @@ onValue(
     if (!servicesContainer) return;
 
 
-    servicesContainer.innerHTML = "";
+    servicesContainer.innerHTML =
+      "";
 
 
     const data =
@@ -330,17 +614,20 @@ onValue(
       `;
 
       return;
+
     }
 
 
-    let approvedCount = 0;
+    let approvedCount =
+      0;
 
 
     Object.values(data).forEach(
       (service) => {
 
         if (
-          service.status !== "approved"
+          service.status !==
+          "approved"
         ) {
 
           return;
@@ -352,7 +639,9 @@ onValue(
 
 
         const card =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
 
 
         card.className =
@@ -382,17 +671,21 @@ onValue(
             <div class="service-meta">
 
               <span class="meta-item">
+
                 📍
                 ${escapeHTML(
                   service.address
                 )}
+
               </span>
 
               <span class="meta-item">
+
                 📞
                 ${escapeHTML(
                   service.phone
                 )}
+
               </span>
 
             </div>
@@ -444,7 +737,6 @@ onValue(
     );
 
   }
-
 );
 
 
@@ -459,8 +751,10 @@ function escapeHTML(value) {
       "div"
     );
 
+
   div.textContent =
     value || "";
+
 
   return div.innerHTML;
 
