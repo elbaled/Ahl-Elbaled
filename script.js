@@ -1,3 +1,5 @@
+script.js
+
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -17,19 +19,35 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
-// ==========================================
+// ===============================
 // Firebase
-// ==========================================
+// ===============================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
-    authDomain: "ahl-elbaled2.firebaseapp.com",
-    databaseURL: "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "ahl-elbaled2",
-    storageBucket: "ahl-elbaled2.firebasestorage.app",
-    messagingSenderId: "984455426367",
-    appId: "1:984455426367:web:5420f680f2a4f9b609238a",
-    measurementId: "G-NQFQWK5T57"
+
+    apiKey:
+        "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+    authDomain:
+        "ahl-elbaled2.firebaseapp.com",
+
+    databaseURL:
+        "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+    projectId:
+        "ahl-elbaled2",
+
+    storageBucket:
+        "ahl-elbaled2.firebasestorage.app",
+
+    messagingSenderId:
+        "984455426367",
+
+    appId:
+        "1:984455426367:web:5420f680f2a4f9b609238a",
+
+    measurementId:
+        "G-NQFQWK5T57"
 };
 
 
@@ -40,41 +58,118 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 
-// ==========================================
+// ===============================
 // عناصر الصفحة
-// ==========================================
+// ===============================
 
 const modal =
-    document.getElementById("addServiceModal");
+    document.getElementById(
+        "addServiceModal"
+    );
 
 const form =
-    document.getElementById("addServiceForm");
+    document.getElementById(
+        "addServiceForm"
+    );
 
 const heroButton =
-    document.getElementById("addServiceHeroBtn");
+    document.getElementById(
+        "addServiceHeroBtn"
+    );
 
 const addButton =
-    document.getElementById("addServiceBtn");
+    document.getElementById(
+        "addServiceBtn"
+    );
 
 const closeButton =
-    document.getElementById("closeModalBtn");
+    document.getElementById(
+        "closeModalBtn"
+    );
 
 const servicesContainer =
-    document.getElementById("servicesContainer");
+    document.getElementById(
+        "servicesContainer"
+    );
 
 
-// ==========================================
-// بيانات المستخدم
-// ==========================================
+// ===============================
+// عناصر نافذة التفاصيل
+// ===============================
+
+const detailsModal =
+    document.getElementById(
+        "serviceDetailsModal"
+    );
+
+const detailsOverlay =
+    document.getElementById(
+        "serviceDetailsOverlay"
+    );
+
+const detailsClose =
+    document.getElementById(
+        "serviceDetailsClose"
+    );
+
+const detailsName =
+    document.getElementById(
+        "detailsName"
+    );
+
+const detailsCategory =
+    document.getElementById(
+        "detailsCategory"
+    );
+
+const detailsDescription =
+    document.getElementById(
+        "detailsDescription"
+    );
+
+const detailsAddress =
+    document.getElementById(
+        "detailsAddress"
+    );
+
+const detailsPhone =
+    document.getElementById(
+        "detailsPhone"
+    );
+
+const detailsWorkingHours =
+    document.getElementById(
+        "detailsWorkingHours"
+    );
+
+const detailsImage =
+    document.getElementById(
+        "detailsImage"
+    );
+
+const detailsGallery =
+    document.getElementById(
+        "detailsGallery"
+    );
+
+const detailsCallButton =
+    document.getElementById(
+        "detailsCallButton"
+    );
+
+
+// ===============================
+// حالة المستخدم
+// ===============================
 
 let currentUser = null;
 
 let currentUserData = null;
 
 
-// ==========================================
+// ===============================
 // التحقق من تسجيل الدخول
-// ==========================================
+// ===============================
 
 onAuthStateChanged(
     auth,
@@ -88,7 +183,7 @@ onAuthStateChanged(
         if (!user) {
 
             console.log(
-                "لا يوجد مستخدم مسجل الدخول"
+                "المستخدم غير مسجل الدخول"
             );
 
             return;
@@ -121,23 +216,18 @@ onAuthStateChanged(
 
 
                 console.log(
-                    "بيانات الحساب:",
+                    "بيانات المستخدم:",
                     currentUserData
-                );
-
-            } else {
-
-                console.log(
-                    "بيانات الحساب غير موجودة في Database"
                 );
 
             }
 
+        }
 
-        } catch (error) {
+        catch (error) {
 
             console.error(
-                "خطأ في قراءة بيانات الحساب:",
+                "خطأ في قراءة بيانات المستخدم:",
                 error
             );
 
@@ -147,38 +237,11 @@ onAuthStateChanged(
 );
 
 
-// ==========================================
+// ===============================
 // فتح نافذة إضافة الخدمة
-// ==========================================
+// ===============================
 
 function openModal() {
-
-    console.log(
-        "تم الضغط على زر أضف خدمتك"
-    );
-
-
-    // ======================================
-    // التأكد من وجود النافذة
-    // ======================================
-
-    if (!modal) {
-
-        alert(
-            "خطأ: نافذة إضافة الخدمة غير موجودة."
-        );
-
-        console.error(
-            "addServiceModal غير موجود في HTML"
-        );
-
-        return;
-    }
-
-
-    // ======================================
-    // لو المستخدم غير مسجل
-    // ======================================
 
     if (!currentUser) {
 
@@ -193,15 +256,38 @@ function openModal() {
     }
 
 
-    // ======================================
-    // فتح النافذة
-    // ======================================
+    if (!currentUserData) {
 
-    modal.style.display = "flex";
+        alert(
+            "جاري تحميل بيانات الحساب، حاول مرة أخرى."
+        );
 
-    modal.style.visibility = "visible";
+        return;
+    }
 
-    modal.style.opacity = "1";
+
+    if (
+        currentUserData.status !==
+        "approved"
+    ) {
+
+        alert(
+            "حسابك لم تتم الموافقة عليه بعد."
+        );
+
+        return;
+    }
+
+
+    if (!modal) {
+
+        alert(
+            "خطأ: نافذة إضافة الخدمة غير موجودة."
+        );
+
+        return;
+    }
+
 
     modal.classList.add("active");
 
@@ -212,32 +298,16 @@ function openModal() {
 
     document.body.style.overflow =
         "hidden";
-
-
-    console.log(
-        "نافذة إضافة الخدمة مفتوحة ✅"
-    );
-
 }
 
 
-// ==========================================
-// إغلاق نافذة إضافة الخدمة
-// ==========================================
+// ===============================
+// إغلاق نافذة الإضافة
+// ===============================
 
 function closeModal() {
 
     if (!modal) return;
-
-
-    modal.style.display =
-        "none";
-
-    modal.style.visibility =
-        "hidden";
-
-    modal.style.opacity =
-        "0";
 
     modal.classList.remove(
         "active"
@@ -251,17 +321,12 @@ function closeModal() {
     document.body.style.overflow =
         "";
 
-
-    console.log(
-        "تم إغلاق النافذة"
-    );
-
 }
 
 
-// ==========================================
-// زر أضف خدمتك الموجود في Hero
-// ==========================================
+// ===============================
+// أزرار إضافة الخدمة
+// ===============================
 
 if (heroButton) {
 
@@ -270,18 +335,8 @@ if (heroButton) {
         openModal
     );
 
-} else {
-
-    console.error(
-        "زر addServiceHeroBtn غير موجود"
-    );
-
 }
 
-
-// ==========================================
-// زر إضافة الآن الموجود أسفل الموقع
-// ==========================================
 
 if (addButton) {
 
@@ -290,18 +345,8 @@ if (addButton) {
         openModal
     );
 
-} else {
-
-    console.error(
-        "زر addServiceBtn غير موجود"
-    );
-
 }
 
-
-// ==========================================
-// زر X لإغلاق النافذة
-// ==========================================
 
 if (closeButton) {
 
@@ -312,10 +357,6 @@ if (closeButton) {
 
 }
 
-
-// ==========================================
-// الضغط على الخلفية لإغلاق النافذة
-// ==========================================
 
 if (modal) {
 
@@ -337,9 +378,9 @@ if (modal) {
 }
 
 
-// ==========================================
+// ===============================
 // إرسال الخدمة
-// ==========================================
+// ===============================
 
 if (form) {
 
@@ -350,92 +391,29 @@ if (form) {
             event.preventDefault();
 
 
-            // ==================================
-            // التأكد من تسجيل الدخول
-            // ==================================
-
             if (!currentUser) {
 
                 alert(
                     "يجب تسجيل الدخول أولًا."
                 );
 
-                window.location.href =
-                    "login.html";
-
                 return;
             }
 
 
-            // ==================================
-            // التأكد من بيانات الحساب
-            // ==================================
-
-            if (!currentUserData) {
-
-                try {
-
-                    const userRef =
-                        ref(
-                            database,
-                            "users/" +
-                            currentUser.uid
-                        );
-
-
-                    const snapshot =
-                        await get(userRef);
-
-
-                    if (
-                        !snapshot.exists()
-                    ) {
-
-                        alert(
-                            "بيانات الحساب غير موجودة."
-                        );
-
-                        return;
-                    }
-
-
-                    currentUserData =
-                        snapshot.val();
-
-                } catch (error) {
-
-                    console.error(error);
-
-                    alert(
-                        "تعذر قراءة بيانات الحساب."
-                    );
-
-                    return;
-                }
-
-            }
-
-
-            // ==================================
-            // التأكد من الموافقة
-            // ==================================
-
             if (
+                !currentUserData ||
                 currentUserData.status !==
                 "approved"
             ) {
 
                 alert(
-                    "حسابك لم تتم الموافقة عليه بعد."
+                    "حسابك غير معتمد لإضافة خدمة."
                 );
 
                 return;
             }
 
-
-            // ==================================
-            // قراءة البيانات
-            // ==================================
 
             const name =
                 document
@@ -481,9 +459,14 @@ if (form) {
                     .trim();
 
 
-            // ==================================
-            // التحقق من البيانات
-            // ==================================
+            const workingHours =
+                document
+                    .getElementById(
+                        "serviceWorkingHours"
+                    )
+                    .value
+                    .trim();
+
 
             if (
                 !name ||
@@ -500,10 +483,6 @@ if (form) {
                 return;
             }
 
-
-            // ==================================
-            // إرسال Firebase
-            // ==================================
 
             try {
 
@@ -539,6 +518,10 @@ if (form) {
                         address:
                             address,
 
+                        workingHours:
+                            workingHours ||
+                            "لم يتم تحديد مواعيد العمل",
+
                         status:
                             "pending",
 
@@ -562,11 +545,12 @@ if (form) {
 
                 form.reset();
 
-
                 closeModal();
 
 
-            } catch (error) {
+            }
+
+            catch (error) {
 
                 console.error(
                     "Firebase Error:",
@@ -575,7 +559,7 @@ if (form) {
 
 
                 alert(
-                    "حدث خطأ أثناء إرسال الخدمة:\n" +
+                    "حدث خطأ أثناء إرسال الخدمة: " +
                     error.message
                 );
 
@@ -584,18 +568,12 @@ if (form) {
         }
     );
 
-} else {
-
-    console.error(
-        "نموذج addServiceForm غير موجود"
-    );
-
 }
 
 
-// ==========================================
-// عرض الخدمات المقبولة فقط
-// ==========================================
+// ===============================
+// عرض الخدمات المقبولة
+// ===============================
 
 if (servicesContainer) {
 
@@ -608,7 +586,6 @@ if (servicesContainer) {
 
     onValue(
         servicesRef,
-
         (snapshot) => {
 
             servicesContainer.innerHTML =
@@ -630,86 +607,125 @@ if (servicesContainer) {
             let count = 0;
 
 
-            Object.values(data).forEach(
-                (service) => {
+            Object.entries(data)
+                .forEach(
+                    ([id, service]) => {
 
-                    if (
-                        service.status !==
-                        "approved"
-                    ) {
+                        if (
+                            service.status !==
+                            "approved"
+                        ) {
 
-                        return;
-                    }
-
-
-                    count++;
+                            return;
+                        }
 
 
-                    const card =
-                        document.createElement(
-                            "div"
-                        );
+                        count++;
 
 
-                    card.className =
-                        "service-card";
+                        const card =
+                            document.createElement(
+                                "div"
+                            );
 
 
-                    card.innerHTML = `
+                        card.className =
+                            "service-card";
 
-                        <div class="service-image">
-                            🏪
-                        </div>
 
-                        <div class="service-content">
+                        /*
+                         * تخزين بيانات الخدمة
+                         * داخل الكارت
+                         */
 
-                            <h3>
-                                ${escapeHTML(
-                                    service.name
-                                )}
-                            </h3>
+                        card.dataset.serviceId =
+                            id;
 
-                            <p>
-                                ${escapeHTML(
-                                    service.description
-                                )}
-                            </p>
 
-                            <div class="service-meta">
+                        card.innerHTML = `
 
-                                <span class="meta-item">
+                            <div class="service-image">
 
-                                    📍
-
-                                    ${escapeHTML(
-                                        service.address
-                                    )}
-
-                                </span>
-
-                                <span class="meta-item">
-
-                                    📞
-
-                                    ${escapeHTML(
-                                        service.phone
-                                    )}
-
-                                </span>
+                                🏪
 
                             </div>
 
-                        </div>
+                            <div class="service-content">
 
-                    `;
+                                <h3>
+                                    ${escapeHTML(
+                                        service.name
+                                    )}
+                                </h3>
+
+                                <p>
+                                    ${escapeHTML(
+                                        service.description
+                                    )}
+                                </p>
+
+                                <div class="service-meta">
+
+                                    <span class="meta-item">
+
+                                        📍
+
+                                        ${escapeHTML(
+                                            service.address
+                                        )}
+
+                                    </span>
+
+                                    <span class="meta-item">
+
+                                        📞
+
+                                        ${escapeHTML(
+                                            service.phone
+                                        )}
+
+                                    </span>
+
+                                </div>
+
+                                <div style="
+                                    margin-top:12px;
+                                    color:#2563eb;
+                                    font-weight:bold;
+                                    font-size:14px;
+                                ">
+
+                                    👆 اضغط لعرض التفاصيل
+
+                                </div>
+
+                            </div>
+
+                        `;
 
 
-                    servicesContainer.appendChild(
-                        card
-                    );
+                        /*
+                         * الضغط على الخدمة
+                         */
 
-                }
-            );
+                        card.addEventListener(
+                            "click",
+                            () => {
+
+                                openServiceDetails(
+                                    service
+                                );
+
+                            }
+                        );
+
+
+                        servicesContainer.appendChild(
+                            card
+                        );
+
+                    }
+                );
 
 
             if (count === 0) {
@@ -727,15 +743,373 @@ if (servicesContainer) {
                 error
             );
 
+            servicesContainer.innerHTML = `
+
+                <div class="empty-state">
+
+                    <span>⚠️</span>
+
+                    <h3>
+                        حدث خطأ في تحميل الخدمات
+                    </h3>
+
+                    <p>
+                        حاول تحديث الصفحة.
+                    </p>
+
+                </div>
+
+            `;
+
         }
     );
 
 }
 
 
-// ==========================================
-// لا توجد خدمات
-// ==========================================
+// ===============================
+// فتح تفاصيل الخدمة
+// ===============================
+
+function openServiceDetails(
+    service
+) {
+
+    if (!detailsModal) {
+
+        console.error(
+            "نافذة تفاصيل الخدمة غير موجودة."
+        );
+
+        return;
+    }
+
+
+    /*
+     * الاسم
+     */
+
+    detailsName.textContent =
+        service.name ||
+        "خدمة بدون اسم";
+
+
+    /*
+     * القسم
+     */
+
+    detailsCategory.textContent =
+        getCategoryName(
+            service.category
+        );
+
+
+    /*
+     * الوصف
+     */
+
+    detailsDescription.textContent =
+        service.description ||
+        "لا يوجد وصف للخدمة.";
+
+
+    /*
+     * العنوان
+     */
+
+    detailsAddress.textContent =
+        service.address ||
+        "لم يتم تحديد العنوان";
+
+
+    /*
+     * الهاتف
+     */
+
+    detailsPhone.textContent =
+        service.phone ||
+        "لم يتم إضافة رقم الهاتف";
+
+
+    /*
+     * مواعيد العمل
+     */
+
+    detailsWorkingHours.textContent =
+        service.workingHours ||
+        "لم يتم تحديد مواعيد العمل";
+
+
+    /*
+     * زر الاتصال
+     */
+
+    if (service.phone) {
+
+        detailsCallButton.href =
+            "tel:" +
+            service.phone;
+
+        detailsCallButton.style.display =
+            "block";
+
+    }
+
+    else {
+
+        detailsCallButton.style.display =
+            "none";
+
+    }
+
+
+    /*
+     * الصورة الرئيسية
+     */
+
+    detailsImage.innerHTML =
+        "🏪";
+
+
+    /*
+     * لو أضفنا صورة لاحقًا
+     * باستخدام image أو imageUrl
+     */
+
+    if (service.imageUrl) {
+
+        const image =
+            document.createElement(
+                "img"
+            );
+
+        image.src =
+            service.imageUrl;
+
+        image.alt =
+            service.name || "صورة الخدمة";
+
+        image.onerror =
+            () => {
+
+                detailsImage.innerHTML =
+                    "🏪";
+
+            };
+
+
+        detailsImage.innerHTML =
+            "";
+
+        detailsImage.appendChild(
+            image
+        );
+
+    }
+
+
+    /*
+     * معرض الصور
+     */
+
+    detailsGallery.innerHTML =
+        "";
+
+
+    if (
+        service.images &&
+        Array.isArray(service.images) &&
+        service.images.length > 0
+    ) {
+
+        service.images.forEach(
+            (imageUrl) => {
+
+                if (!imageUrl) return;
+
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                image.src =
+                    imageUrl;
+
+
+                image.alt =
+                    service.name ||
+                    "صورة الخدمة";
+
+
+                image.onerror =
+                    () => {
+
+                        image.style.display =
+                            "none";
+
+                    };
+
+
+                detailsGallery.appendChild(
+                    image
+                );
+
+            }
+        );
+
+    }
+
+    else {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "service-gallery-empty";
+
+
+        empty.textContent =
+            "🖼️ لا توجد صور مضافة حاليًا";
+
+
+        detailsGallery.appendChild(
+            empty
+        );
+
+    }
+
+
+    /*
+     * إظهار النافذة
+     */
+
+    detailsModal.classList.add(
+        "active"
+    );
+
+
+    detailsModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+// ===============================
+// إغلاق تفاصيل الخدمة
+// ===============================
+
+function closeServiceDetails() {
+
+    if (!detailsModal) return;
+
+
+    detailsModal.classList.remove(
+        "active"
+    );
+
+
+    detailsModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+if (detailsClose) {
+
+    detailsClose.addEventListener(
+        "click",
+        closeServiceDetails
+    );
+
+}
+
+
+if (detailsOverlay) {
+
+    detailsOverlay.addEventListener(
+        "click",
+        closeServiceDetails
+    );
+
+}
+
+
+// ===============================
+// زر ESC لإغلاق النافذة
+// ===============================
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeServiceDetails();
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+// ===============================
+// أسماء الأقسام
+// ===============================
+
+function getCategoryName(
+    category
+) {
+
+    const categories = {
+
+        services:
+            "🛠️ الخدمات",
+
+        pharmacies:
+            "💊 الصيدليات",
+
+        herbal:
+            "🌿 العطارة",
+
+        shops:
+            "🛒 المحلات"
+
+    };
+
+
+    return (
+        categories[category] ||
+        category ||
+        "خدمة"
+    );
+
+}
+
+
+// ===============================
+// رسالة عدم وجود خدمات
+// ===============================
 
 function showEmptyServices() {
 
@@ -764,11 +1138,13 @@ function showEmptyServices() {
 }
 
 
-// ==========================================
+// ===============================
 // حماية HTML
-// ==========================================
+// ===============================
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     const div =
         document.createElement(
@@ -784,10 +1160,6 @@ function escapeHTML(value) {
 
 }
 
-
-// ==========================================
-// رسالة نجاح
-// ==========================================
 
 console.log(
     "أهل البلد - script.js يعمل بنجاح ✅"
