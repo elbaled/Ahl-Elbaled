@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>إنشاء حساب - أهل البلد</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background: #f5f7fa;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+        }
+
+
+        .register-box {
+
+            width: 100%;
+
+            max-width: 430px;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 8px 30px rgba(0,0,0,0.10);
+
+        }
+
+
+        .logo {
+
+            text-align: center;
+
+            font-size: 42px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        h1 {
+
+            text-align: center;
+
+            margin: 0 0 8px;
+
+        }
+
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #777;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: bold;
+
+        }
+
+
+        input {
+
+            width: 100%;
+
+            padding: 13px;
+
+            margin-bottom: 18px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+        }
+
+
+        button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        button:disabled {
+
+            opacity: 0.6;
+
+        }
+
+
+        #message {
+
+            margin-top: 15px;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            line-height: 1.6;
+
+        }
+
+
+        .back {
+
+            display: block;
+
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="register-box">
+
+
+    <div class="logo">
+        🏠
+    </div>
+
+
+    <h1>
+        أهل البلد
+    </h1>
+
+
+    <p class="subtitle">
+        إنشاء حساب جديد
+    </p>
+
+
+    <form id="registerForm">
+
+
+        <label for="name">
+            الاسم
+        </label>
+
+        <input
+            type="text"
+            id="name"
+            placeholder="اكتب اسمك"
+            required
+        >
+
+
+        <label for="email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            required
+        >
+
+
+        <label for="password">
+            كلمة المرور
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="6 أحرف على الأقل"
+            minlength="6"
+            required
+        >
+
+
+        <label for="confirmPassword">
+            تأكيد كلمة المرور
+        </label>
+
+        <input
+            type="password"
+            id="confirmPassword"
+            placeholder="أعد كتابة كلمة المرور"
+            minlength="6"
+            required
+        >
+
+
+        <button
+            type="submit"
+            id="registerButton">
+
+            إنشاء الحساب
+
+        </button>
+
+
+    </form>
+
+
+    <div id="message"></div>
+
+
+    <a
+        href="login.html"
+        class="back">
+
+        ← عندي حساب بالفعل
+
+    </a>
+
+
+    <a
+        href="index.html"
+        class="back">
+
+        ← العودة للموقع
+
+    </a>
+
+
+</div>
+
+
+<script type="module">
+
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+
+import {
+    getDatabase,
+    ref,
+    get,
+    runTransaction,
+    set
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+    authDomain:
+        "ahl-elbaled2.firebaseapp.com",
+
+    databaseURL:
+        "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+    projectId:
+        "ahl-elbaled2",
+
+    storageBucket:
+        "ahl-elbaled2.firebasestorage.app",
+
+    messagingSenderId:
+        "984455426367",
+
+    appId:
+        "1:984455426367:web:5420f680f2a4f9b609238a",
+
+    measurementId:
+        "G-NQFQWK5T57"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const auth =
+    getAuth(app);
+
+
+const database =
+    getDatabase(app);
+
+
+const form =
+    document.getElementById(
+        "registerForm"
+    );
+
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+const button =
+    document.getElementById(
+        "registerButton"
+    );
+
+
+form.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+
+        const name =
+            document
+                .getElementById("name")
+                .value
+                .trim();
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        const confirmPassword =
+            document
+                .getElementById(
+                    "confirmPassword"
+                )
+                .value;
+
+
+        if (
+            password !==
+            confirmPassword
+        ) {
+
+            message.textContent =
+                "كلمتا المرور غير متطابقتين ❌";
+
+            return;
+        }
+
+
+        if (password.length < 6) {
+
+            message.textContent =
+                "كلمة المرور يجب أن تكون 6 أحرف على الأقل.";
+
+            return;
+        }
+
+
+        button.disabled =
+            true;
+
+
+        message.textContent =
+            "جاري إنشاء الحساب...";
+
+
+        try {
+
+
+            /*
+             * إنشاء الحساب في Firebase Authentication
+             */
+
+            const result =
+                await createUserWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+
+            const user =
+                result.user;
+
+
+            /*
+             * حفظ اسم المستخدم
+             */
+
+            await updateProfile(
+                user,
+                {
+                    displayName: name
+                }
+            );
+
+
+            /*
+             * إنشاء رقم حساب متسلسل
+             */
+
+            const counterRef =
+                ref(
+                    database,
+                    "settings/accountCounter"
+                );
+
+
+            const transactionResult =
+                await runTransaction(
+                    counterRef,
+                    (currentValue) => {
+
+                        return (
+                            (currentValue || 0) + 1
+                        );
+
+                    }
+                );
+
+
+            const accountNumber =
+                transactionResult.snapshot.val();
+
+
+            /*
+             * حفظ بيانات المستخدم
+             */
+
+            await set(
+                ref(
+                    database,
+                    "users/" + user.uid
+                ),
+                {
+
+                    accountNumber:
+                        accountNumber,
+
+                    name:
+                        name,
+
+                    email:
+                        email,
+
+                    role:
+                        "user",
+
+                    status:
+                        "pending",
+
+                    createdAt:
+                        Date.now()
+
+                }
+            );
+
+
+            message.innerHTML = `
+
+                تم إنشاء حسابك بنجاح ✅
+
+                <br>
+
+                رقم حسابك:
+                <strong>
+                    ${accountNumber}
+                </strong>
+
+                <br>
+
+                حسابك الآن قيد مراجعة الإدارة ⏳
+
+                <br>
+
+                بعد الموافقة يمكنك تسجيل الدخول.
+
+            `;
+
+
+            form.reset();
+
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "login.html";
+
+            }, 3500);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            if (
+                error.code ===
+                "auth/email-already-in-use"
+            ) {
+
+                message.textContent =
+                    "هذا البريد الإلكتروني مسجل بالفعل.";
+
+            }
+
+            else if (
+                error.code ===
+                "auth/invalid-email"
+            ) {
+
+                message.textContent =
+                    "البريد الإلكتروني غير صحيح.";
+
+            }
+
+            else {
+
+                message.textContent =
+                    "حدث خطأ: " +
+                    error.code;
+
+            }
+
+
+            button.disabled =
+                false;
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>
