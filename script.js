@@ -1,416 +1,142 @@
-// ========================================
-// أهل البلد - Main JavaScript
-// ========================================
+import {
+  getDatabase,
+  ref,
+  push,
+  set,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+const database = getDatabase();
 
-    // ==============================
-    // العناصر الأساسية
-    // ==============================
+// عناصر الصفحة
+const form = document.getElementById("addServiceForm");
+const servicesContainer = document.getElementById("servicesContainer");
 
-    const addServiceModal =
-        document.getElementById("addServiceModal");
+// إضافة خدمة
+if (form) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-    const addServiceBtn =
-        document.getElementById("addServiceBtn");
+    const name = document.getElementById("serviceName")?.value.trim();
+    const category = document.getElementById("serviceCategory")?.value;
+    const description = document.getElementById("serviceDescription")?.value.trim();
+    const phone = document.getElementById("servicePhone")?.value.trim();
+    const address = document.getElementById("serviceAddress")?.value.trim();
 
-    const addServiceHeroBtn =
-        document.getElementById("addServiceHeroBtn");
-
-    const closeModalBtn =
-        document.getElementById("closeModalBtn");
-
-    const modalOverlay =
-        document.querySelector(".modal-overlay");
-
-    const addServiceForm =
-        document.getElementById("addServiceForm");
-
-    const notificationBtn =
-        document.getElementById("notificationBtn");
-
-    const notificationsPanel =
-        document.getElementById("notificationsPanel");
-
-    const closeNotificationsBtn =
-        document.getElementById("closeNotificationsBtn");
-
-    const searchInput =
-        document.getElementById("searchInput");
-
-    const searchBtn =
-        document.getElementById("searchBtn");
-
-    const servicesContainer =
-        document.getElementById("servicesContainer");
-
-
-    // ==============================
-    // فتح نافذة إضافة الخدمة
-    // ==============================
-
-    function openAddServiceModal() {
-
-        if (!addServiceModal) return;
-
-        addServiceModal.classList.add("active");
-        addServiceModal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-        document.body.style.overflow = "hidden";
+    if (!name || !category || !description || !phone || !address) {
+      alert("من فضلك املأ جميع البيانات المطلوبة.");
+      return;
     }
 
+    try {
+      const servicesRef = ref(database, "services");
+      const newService = push(servicesRef);
 
-    // ==============================
-    // إغلاق نافذة إضافة الخدمة
-    // ==============================
+      await set(newService, {
+        name,
+        category,
+        description,
+        phone,
+        address,
+        status: "pending",
+        createdAt: Date.now()
+      });
 
-    function closeAddServiceModal() {
+      alert("تم إرسال طلبك للمراجعة بنجاح ✅");
 
-        if (!addServiceModal) return;
+      form.reset();
 
-        addServiceModal.classList.remove("active");
-        addServiceModal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-        document.body.style.overflow = "";
+    } catch (error) {
+      console.error(error);
+      alert("حدث خطأ أثناء إرسال البيانات.");
     }
+  });
+}
 
+// عرض الخدمات المقبولة فقط
+const servicesRef = ref(database, "services");
 
-    // ==============================
-    // أزرار إضافة الخدمة
-    // ==============================
+onValue(servicesRef, (snapshot) => {
 
-    if (addServiceBtn) {
+  if (!servicesContainer) return;
 
-        addServiceBtn.addEventListener(
-            "click",
-            openAddServiceModal
-        );
-    }
+  servicesContainer.innerHTML = "";
 
+  const data = snapshot.val();
 
-    if (addServiceHeroBtn) {
+  if (!data) {
+    servicesContainer.innerHTML = `
+      <div class="empty-state">
+        <span>📭</span>
+        <h3>لا توجد خدمات منشورة حاليًا</h3>
+        <p>سيتم عرض الخدمات بعد اعتمادها.</p>
+      </div>
+    `;
+    return;
+  }
 
-        addServiceHeroBtn.addEventListener(
-            "click",
-            openAddServiceModal
-        );
-    }
+  let approvedCount = 0;
 
+  Object.values(data).forEach((service) => {
 
-    if (closeModalBtn) {
+    if (service.status !== "approved") return;
 
-        closeModalBtn.addEventListener(
-            "click",
-            closeAddServiceModal
-        );
-    }
+    approvedCount++;
 
+    const card = document.createElement("div");
 
-    if (modalOverlay) {
+    card.className = "service-card";
 
-        modalOverlay.addEventListener(
-            "click",
-            closeAddServiceModal
-        );
-    }
+    card.innerHTML = `
+      <div class="service-image">
+        🏪
+      </div>
 
+      <div class="service-content">
 
-    // ==============================
-    // إغلاق النافذة بزر ESC
-    // ==============================
+        <h3>${escapeHTML(service.name)}</h3>
 
-    document.addEventListener(
-        "keydown",
-        (event) => {
+        <p>${escapeHTML(service.description)}</p>
 
-            if (event.key === "Escape") {
+        <div class="service-meta">
 
-                closeAddServiceModal();
+          <span class="meta-item">
+            📍 ${escapeHTML(service.address)}
+          </span>
 
-            }
+          <span class="meta-item">
+            📞 ${escapeHTML(service.phone)}
+          </span>
 
-        }
-    );
+        </div>
 
+      </div>
+    `;
 
-    // ==============================
-    // نموذج إضافة الخدمة
-    // ==============================
+    servicesContainer.appendChild(card);
+  });
 
-    if (addServiceForm) {
+  if (approvedCount === 0) {
 
-        addServiceForm.addEventListener(
-            "submit",
-            (event) => {
-
-                event.preventDefault();
-
-                const serviceName =
-                    document.getElementById(
-                        "serviceName"
-                    ).value.trim();
-
-                const serviceCategory =
-                    document.getElementById(
-                        "serviceCategory"
-                    ).value;
-
-                const serviceDescription =
-                    document.getElementById(
-                        "serviceDescription"
-                    ).value.trim();
-
-                const servicePhone =
-                    document.getElementById(
-                        "servicePhone"
-                    ).value.trim();
-
-                const serviceAddress =
-                    document.getElementById(
-                        "serviceAddress"
-                    ).value.trim();
-
-
-                if (
-                    !serviceName ||
-                    !serviceCategory ||
-                    !serviceDescription ||
-                    !servicePhone ||
-                    !serviceAddress
-                ) {
-
-                    alert(
-                        "من فضلك املأ جميع البيانات المطلوبة."
-                    );
-
-                    return;
-                }
-
-
-                /*
-                 * مؤقتًا سنعرض رسالة فقط.
-                 *
-                 * في المرحلة القادمة:
-                 * البيانات هتروح إلى Firebase
-                 * بحالة:
-                 *
-                 * pending
-                 *
-                 * وبعد موافقة الإدارة
-                 * تتحول إلى:
-                 *
-                 * approved
-                 */
-
-
-                alert(
-                    "تم إرسال الخدمة للمراجعة بنجاح ✅"
-                );
-
-
-                addServiceForm.reset();
-
-                closeAddServiceModal();
-
-            }
-        );
-
-    }
-
-
-    // ==============================
-    // الإشعارات
-    // ==============================
-
-    if (notificationBtn) {
-
-        notificationBtn.addEventListener(
-            "click",
-            () => {
-
-                if (!notificationsPanel) return;
-
-                notificationsPanel.classList.toggle(
-                    "active"
-                );
-
-                const isOpen =
-                    notificationsPanel.classList.contains(
-                        "active"
-                    );
-
-                notificationsPanel.setAttribute(
-                    "aria-hidden",
-                    isOpen ? "false" : "true"
-                );
-
-            }
-        );
-
-    }
-
-
-    if (closeNotificationsBtn) {
-
-        closeNotificationsBtn.addEventListener(
-            "click",
-            () => {
-
-                notificationsPanel.classList.remove(
-                    "active"
-                );
-
-                notificationsPanel.setAttribute(
-                    "aria-hidden",
-                    "true"
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==============================
-    // البحث
-    // ==============================
-
-    function searchServices() {
-
-        const searchText =
-            searchInput
-                ? searchInput.value.trim().toLowerCase()
-                : "";
-
-
-        if (!searchText) {
-
-            alert(
-                "اكتب اسم الخدمة أو المحل الذي تبحث عنه."
-            );
-
-            return;
-        }
-
-
-        /*
-         * البحث الحقيقي في الخدمات
-         * هنربطه ببيانات Firebase
-         * في المرحلة القادمة.
-         */
-
-        alert(
-            `جاري البحث عن: ${searchText}`
-        );
-
-    }
-
-
-    if (searchBtn) {
-
-        searchBtn.addEventListener(
-            "click",
-            searchServices
-        );
-
-    }
-
-
-    if (searchInput) {
-
-        searchInput.addEventListener(
-            "keydown",
-            (event) => {
-
-                if (event.key === "Enter") {
-
-                    searchServices();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    // ==============================
-    // التصنيفات
-    // ==============================
-
-    const categoryButtons =
-        document.querySelectorAll(
-            ".category-card"
-        );
-
-
-    categoryButtons.forEach(
-        (button) => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const category =
-                        button.dataset.category;
-
-                    /*
-                     * لاحقًا هنستخدم category
-                     * لعرض الخدمات الخاصة بالقسم
-                     * من Firebase.
-                     */
-
-                    if (servicesContainer) {
-
-                        servicesContainer.scrollIntoView({
-                            behavior: "smooth"
-                        });
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-    // ==============================
-    // تسجيل الدخول
-    // ==============================
-
-    const loginBtn =
-        document.getElementById("loginBtn");
-
-
-    if (loginBtn) {
-
-        loginBtn.addEventListener(
-            "click",
-            () => {
-
-                alert(
-                    "صفحة تسجيل الدخول هنضيفها في المرحلة القادمة."
-                );
-
-            }
-        );
-
-    }
-
-
-    // ==============================
-    // رسالة بداية الموقع
-    // ==============================
-
-    console.log(
-        "أهل البلد يعمل بنجاح ✅"
-    );
+    servicesContainer.innerHTML = `
+      <div class="empty-state">
+        <span>⏳</span>
+        <h3>لا توجد خدمات منشورة حاليًا</h3>
+        <p>الخدمات الجديدة تظهر بعد موافقة الإدارة.</p>
+      </div>
+    `;
+  }
 
 });
+
+// حماية النصوص
+function escapeHTML(value) {
+
+  const div = document.createElement("div");
+
+  div.textContent = value || "";
+
+  return div.innerHTML;
+}
+
+console.log("أهل البلد يعمل مع Firebase ✅");
