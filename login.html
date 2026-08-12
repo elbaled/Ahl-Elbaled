@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>دخول الإدارة - أهل البلد</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>تسجيل الدخول - أهل البلد</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -92,21 +96,309 @@
         .back {
             display: block;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 18px;
             color: #2563eb;
             text-decoration: none;
         }
+
     </style>
+
 </head>
 
 <body>
 
-    <div class="login-box">
+<div class="login-box">
 
-        <div class="logo">🏠</div>
+    <div class="logo">🏠</div>
 
-        <h1>أهل البلد</h1>
+    <h1>أهل البلد</h1>
 
+    <p class="subtitle">
+        تسجيل الدخول
+    </p>
+
+
+    <form id="loginForm">
+
+        <label for="email">
+            البريد الإلكتروني
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            required
+            autocomplete="username"
+        >
+
+
+        <label for="password">
+            كلمة المرور
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            placeholder="كلمة المرور"
+            required
+            autocomplete="current-password"
+        >
+
+
+        <button
+            type="submit"
+            id="loginButton">
+
+            دخول
+
+        </button>
+
+    </form>
+
+
+    <div id="message"></div>
+
+
+    <a href="register.html" class="back">
+        📝 إنشاء حساب جديد
+    </a>
+
+
+    <a href="index.html" class="back">
+        ← العودة للموقع
+    </a>
+
+</div>
+
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+
+import {
+    getAuth,
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+
+import {
+    getDatabase,
+    ref,
+    get
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+    authDomain: "ahl-elbaled2.firebaseapp.com",
+
+    databaseURL:
+        "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+    projectId: "ahl-elbaled2",
+
+    storageBucket:
+        "ahl-elbaled2.firebasestorage.app",
+
+    messagingSenderId:
+        "984455426367",
+
+    appId:
+        "1:984455426367:web:5420f680f2a4f9b609238a",
+
+    measurementId:
+        "G-NQFQWK5T57"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const auth =
+    getAuth(app);
+
+
+const database =
+    getDatabase(app);
+
+
+const loginForm =
+    document.getElementById("loginForm");
+
+
+const message =
+    document.getElementById("message");
+
+
+const loginButton =
+    document.getElementById("loginButton");
+
+
+loginForm.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        message.textContent =
+            "جاري تسجيل الدخول...";
+
+
+        loginButton.disabled =
+            true;
+
+
+        try {
+
+            const result =
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+
+            const uid =
+                result.user.uid;
+
+
+            const userRef =
+                ref(
+                    database,
+                    "users/" + uid
+                );
+
+
+            const snapshot =
+                await get(userRef);
+
+
+            if (!snapshot.exists()) {
+
+                message.textContent =
+                    "الحساب موجود ولكن بياناته غير مكتملة.";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            const userData =
+                snapshot.val();
+
+
+            if (
+                userData.status === "pending"
+            ) {
+
+                message.textContent =
+                    "حسابك قيد المراجعة ⏳";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            if (
+                userData.status === "rejected"
+            ) {
+
+                message.textContent =
+                    "تم رفض طلب إنشاء الحساب ❌";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            if (
+                userData.status !== "approved"
+            ) {
+
+                message.textContent =
+                    "حالة الحساب غير معروفة.";
+
+                loginButton.disabled =
+                    false;
+
+                return;
+            }
+
+
+            message.textContent =
+                "تم تسجيل الدخول بنجاح ✅";
+
+
+            setTimeout(() => {
+
+                if (
+                    userData.role === "admin"
+                ) {
+
+                    window.location.href =
+                        "admin.html";
+
+                } else {
+
+                    window.location.href =
+                        "index.html";
+
+                }
+
+            }, 700);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            message.textContent =
+                "خطأ Firebase: " +
+                error.code;
+
+
+            loginButton.disabled =
+                false;
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
         <p class="subtitle">
             تسجيل دخول الإدارة
         </p>
