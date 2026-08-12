@@ -10,7 +10,6 @@
 
     <title>إنشاء حساب - أهل البلد</title>
 
-
     <style>
 
         * {
@@ -18,188 +17,109 @@
         }
 
         body {
-
             margin: 0;
-
             min-height: 100vh;
-
             font-family: Arial, sans-serif;
-
             background: #f5f7fa;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             padding: 20px;
-
         }
-
 
         .register-box {
-
             width: 100%;
-
             max-width: 430px;
-
             background: white;
-
             padding: 30px;
-
             border-radius: 18px;
-
-            box-shadow:
-                0 8px 30px rgba(0,0,0,0.10);
-
+            box-shadow: 0 8px 30px rgba(0,0,0,.10);
         }
-
 
         .logo {
-
             text-align: center;
-
             font-size: 42px;
-
             margin-bottom: 10px;
-
         }
-
 
         h1 {
-
             text-align: center;
-
             margin: 0 0 8px;
-
         }
-
 
         .subtitle {
-
             text-align: center;
-
             color: #777;
-
             margin-bottom: 25px;
-
         }
-
 
         label {
-
             display: block;
-
             margin-bottom: 7px;
-
             font-weight: bold;
-
         }
-
 
         input {
-
             width: 100%;
-
             padding: 13px;
-
             margin-bottom: 18px;
-
             border: 1px solid #ddd;
-
             border-radius: 10px;
-
             font-size: 16px;
-
         }
-
 
         button {
-
             width: 100%;
-
             padding: 14px;
-
             border: 0;
-
             border-radius: 10px;
-
             background: #2563eb;
-
             color: white;
-
             font-size: 17px;
-
             font-weight: bold;
-
             cursor: pointer;
-
         }
-
 
         button:disabled {
-
-            opacity: 0.6;
-
+            opacity: .6;
         }
-
 
         #message {
-
             margin-top: 15px;
-
             text-align: center;
-
             font-weight: bold;
-
-            line-height: 1.6;
-
+            line-height: 1.7;
         }
 
-
         .back {
-
             display: block;
-
             text-align: center;
-
             margin-top: 18px;
-
             color: #2563eb;
-
             text-decoration: none;
-
         }
 
     </style>
 
 </head>
 
-
 <body>
 
-
 <div class="register-box">
-
 
     <div class="logo">
         🏠
     </div>
 
-
     <h1>
         أهل البلد
     </h1>
-
 
     <p class="subtitle">
         إنشاء حساب جديد
     </p>
 
-
     <form id="registerForm">
-
 
         <label for="name">
             الاسم
@@ -212,7 +132,6 @@
             required
         >
 
-
         <label for="email">
             البريد الإلكتروني
         </label>
@@ -223,7 +142,6 @@
             placeholder="example@email.com"
             required
         >
-
 
         <label for="password">
             كلمة المرور
@@ -237,7 +155,6 @@
             required
         >
 
-
         <label for="confirmPassword">
             تأكيد كلمة المرور
         </label>
@@ -250,7 +167,6 @@
             required
         >
 
-
         <button
             type="submit"
             id="registerButton">
@@ -259,41 +175,25 @@
 
         </button>
 
-
     </form>
-
 
     <div id="message"></div>
 
-
-    <a
-        href="login.html"
-        class="back">
-
+    <a href="login.html" class="back">
         ← عندي حساب بالفعل
-
     </a>
 
-
-    <a
-        href="index.html"
-        class="back">
-
+    <a href="index.html" class="back">
         ← العودة للموقع
-
     </a>
-
 
 </div>
 
-
 <script type="module">
-
 
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-
 
 import {
     getAuth,
@@ -301,11 +201,9 @@ import {
     updateProfile
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
-
 import {
     getDatabase,
     ref,
-    get,
     runTransaction,
     set
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
@@ -313,7 +211,8 @@ import {
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+    apiKey:
+        "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
 
     authDomain:
         "ahl-elbaled2.firebaseapp.com",
@@ -342,31 +241,21 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
-
 const auth =
     getAuth(app);
-
 
 const database =
     getDatabase(app);
 
 
 const form =
-    document.getElementById(
-        "registerForm"
-    );
-
+    document.getElementById("registerForm");
 
 const message =
-    document.getElementById(
-        "message"
-    );
-
+    document.getElementById("message");
 
 const button =
-    document.getElementById(
-        "registerButton"
-    );
+    document.getElementById("registerButton");
 
 
 form.addEventListener(
@@ -375,13 +264,11 @@ form.addEventListener(
 
         event.preventDefault();
 
-
         const name =
             document
                 .getElementById("name")
                 .value
                 .trim();
-
 
         const email =
             document
@@ -389,25 +276,27 @@ form.addEventListener(
                 .value
                 .trim();
 
-
         const password =
             document
                 .getElementById("password")
                 .value;
 
-
         const confirmPassword =
             document
-                .getElementById(
-                    "confirmPassword"
-                )
+                .getElementById("confirmPassword")
                 .value;
 
 
-        if (
-            password !==
-            confirmPassword
-        ) {
+        if (!name) {
+
+            message.textContent =
+                "من فضلك اكتب الاسم.";
+
+            return;
+        }
+
+
+        if (password !== confirmPassword) {
 
             message.textContent =
                 "كلمتا المرور غير متطابقتين ❌";
@@ -425,9 +314,7 @@ form.addEventListener(
         }
 
 
-        button.disabled =
-            true;
-
+        button.disabled = true;
 
         message.textContent =
             "جاري إنشاء الحساب...";
@@ -435,9 +322,8 @@ form.addEventListener(
 
         try {
 
-
             /*
-             * إنشاء الحساب في Firebase Authentication
+             * إنشاء الحساب في Authentication
              */
 
             const result =
@@ -453,7 +339,7 @@ form.addEventListener(
 
 
             /*
-             * حفظ اسم المستخدم
+             * حفظ الاسم في Firebase Auth
              */
 
             await updateProfile(
@@ -465,7 +351,7 @@ form.addEventListener(
 
 
             /*
-             * إنشاء رقم حساب متسلسل
+             * إنشاء رقم حساب
              */
 
             const counterRef =
@@ -481,7 +367,7 @@ form.addEventListener(
                     (currentValue) => {
 
                         return (
-                            (currentValue || 0) + 1
+                            Number(currentValue || 0) + 1
                         );
 
                     }
@@ -493,7 +379,7 @@ form.addEventListener(
 
 
             /*
-             * حفظ بيانات المستخدم
+             * حفظ المستخدم
              */
 
             await set(
@@ -529,20 +415,21 @@ form.addEventListener(
 
                 تم إنشاء حسابك بنجاح ✅
 
-                <br>
+                <br><br>
 
                 رقم حسابك:
+
                 <strong>
                     ${accountNumber}
                 </strong>
 
-                <br>
+                <br><br>
 
                 حسابك الآن قيد مراجعة الإدارة ⏳
 
                 <br>
 
-                بعد الموافقة يمكنك تسجيل الدخول.
+                بعد موافقة الإدارة يمكنك تسجيل الدخول.
 
             `;
 
@@ -550,17 +437,25 @@ form.addEventListener(
             form.reset();
 
 
-            setTimeout(() => {
+            setTimeout(
+                () => {
 
-                window.location.href =
-                    "login.html";
+                    window.location.href =
+                        "login.html";
 
-            }, 3500);
+                },
+                3500
+            );
 
 
-        } catch (error) {
+        }
 
-            console.error(error);
+        catch (error) {
+
+            console.error(
+                "Register Error:",
+                error
+            );
 
 
             if (
@@ -583,17 +478,39 @@ form.addEventListener(
 
             }
 
+            else if (
+                error.code ===
+                "auth/weak-password"
+            ) {
+
+                message.textContent =
+                    "كلمة المرور ضعيفة.";
+
+            }
+
+            else if (
+                error.code ===
+                "PERMISSION_DENIED"
+            ) {
+
+                message.textContent =
+                    "تم إنشاء الحساب لكن Firebase منع حفظ البيانات. راجع Rules.";
+
+            }
+
             else {
 
                 message.textContent =
                     "حدث خطأ: " +
-                    error.code;
+                    (
+                        error.message ||
+                        error.code
+                    );
 
             }
 
 
-            button.disabled =
-                false;
+            button.disabled = false;
 
         }
 
@@ -601,7 +518,6 @@ form.addEventListener(
 );
 
 </script>
-
 
 </body>
 
