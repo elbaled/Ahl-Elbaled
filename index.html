@@ -2,320 +2,592 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <meta name="description"
-        content="أهل البلد - خدمات ومحلات وصيدليات وعطارة وأرقام تهمك وإعلانات بلدك">
+          content="أهل البلد - خدمات ومحلات وصيدليات وعطارة وأرقام تهمك وإعلانات بلدك">
 
     <title>أهل البلد | خدمات بلدك في مكان واحد</title>
 
     <link rel="stylesheet" href="style.css">
 
+
     <style>
-        /* =========================
-           SERVICE DETAILS MODAL
-        ========================= */
 
-        .service-details-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .service-details-modal.active {
-            display: flex;
-        }
-
-        .service-details-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.65);
-        }
-
-        .service-details-content {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
-        }
-
-        .service-details-close {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            width: 38px;
-            height: 38px;
-            border: 0;
-            border-radius: 50%;
-            background: #f1f5f9;
-            color: #333;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .service-details-image {
-            width: 100%;
-            height: 220px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #2563eb, #60a5fa);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 70px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .service-details-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .service-details-title {
-            margin: 0 40px 8px 0;
-            font-size: 25px;
-            color: #1e3a8a;
-        }
-
-        .service-details-category {
-            display: inline-block;
-            background: #eff6ff;
-            color: #2563eb;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-bottom: 18px;
-        }
-
-        .service-details-description {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-
-        .service-detail-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 13px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .service-detail-icon {
-            font-size: 23px;
-            min-width: 32px;
-        }
-
-        .service-detail-info {
-            flex: 1;
-        }
-
-        .service-detail-info strong {
-            display: block;
-            margin-bottom: 4px;
-            color: #222;
-        }
-
-        .service-detail-info span {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .service-phone-btn {
-            display: block;
-            width: 100%;
-            margin-top: 20px;
-            padding: 14px;
-            border-radius: 12px;
-            background: #16a34a;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 17px;
-        }
-
-        /* =========================
-           ADD SERVICE MODAL FIX
-        ========================= */
+        /* =========================================
+           نافذة إضافة الخدمة
+        ========================================= */
 
         .modal {
             position: fixed;
             inset: 0;
             z-index: 10000;
+
             display: none;
+
             align-items: center;
             justify-content: center;
+
             padding: 15px;
         }
 
         .modal.active {
-            display: flex !important;
+            display: flex;
         }
 
         .modal-overlay {
             position: absolute;
             inset: 0;
+
             background: rgba(0, 0, 0, 0.65);
         }
 
         .modal-content {
             position: relative;
             z-index: 2;
+
             width: 100%;
             max-width: 600px;
+
             max-height: 90vh;
             overflow-y: auto;
-            background: #fff;
+
+            background: #ffffff;
+
             border-radius: 20px;
+
             padding: 25px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.25);
+
+            animation: modalOpen .25s ease;
+        }
+
+        @keyframes modalOpen {
+
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
         }
 
         .modal-close {
+
             position: absolute;
+
             top: 12px;
             left: 12px;
-            width: 38px;
-            height: 38px;
-            border: 0;
+
+            width: 40px;
+            height: 40px;
+
+            border: none;
+
             border-radius: 50%;
+
             background: #f1f5f9;
+
             color: #333;
-            font-size: 20px;
+
+            font-size: 22px;
+
             cursor: pointer;
+
         }
 
         .modal-header {
+
             text-align: center;
-            margin-bottom: 20px;
+
+            margin-bottom: 25px;
         }
 
         .modal-header > span {
-            font-size: 40px;
+
+            display: block;
+
+            font-size: 45px;
+
+            margin-bottom: 8px;
         }
 
         .modal-header h2 {
-            margin: 8px 0;
+
+            margin: 0 0 8px;
+
+            color: #1e3a8a;
         }
 
         .modal-header p {
+
+            margin: 0;
+
             color: #777;
         }
 
         .form-group {
-            margin-bottom: 15px;
+
+            margin-bottom: 18px;
         }
 
         .form-group label {
+
             display: block;
+
             margin-bottom: 7px;
+
             font-weight: bold;
+
+            color: #333;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
+
             width: 100%;
+
             box-sizing: border-box;
-            padding: 12px;
+
+            padding: 13px;
+
             border: 1px solid #ddd;
+
             border-radius: 10px;
+
             font-family: inherit;
+
             font-size: 15px;
+
+            outline: none;
+
+            background: #fff;
         }
 
-        .form-group textarea {
-            resize: vertical;
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, .10);
         }
 
         .submit-btn {
+
             width: 100%;
-            border: 0;
+
+            border: none;
+
             cursor: pointer;
         }
 
         .form-note {
+
             text-align: center;
-            color: #777;
+
+            color: #888;
+
             font-size: 13px;
+
+            line-height: 1.6;
+
             margin-top: 12px;
         }
 
-        .service-gallery {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 18px;
+
+        /* =========================================
+           نافذة تفاصيل الخدمة
+        ========================================= */
+
+        .service-details-modal {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 15px;
         }
 
-        .service-gallery-empty {
-            grid-column: 1 / -1;
-            background: #f8fafc;
-            padding: 20px;
-            text-align: center;
-            border-radius: 12px;
-            color: #888;
+        .service-details-modal.active {
+
+            display: flex;
         }
 
-        .service-gallery img {
+        .service-details-overlay {
+
+            position: absolute;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, .65);
+        }
+
+        .service-details-content {
+
+            position: relative;
+
+            z-index: 2;
+
             width: 100%;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 10px;
+
+            max-width: 600px;
+
+            max-height: 90vh;
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 15px 50px rgba(0, 0, 0, .25);
+
+            animation: serviceModalOpen .25s ease;
         }
 
-        .service-card {
+        @keyframes serviceModalOpen {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(20px)
+                    scale(.97);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+        .service-details-close {
+
+            position: absolute;
+
+            top: 12px;
+            left: 12px;
+
+            width: 38px;
+            height: 38px;
+
+            border: 0;
+
+            border-radius: 50%;
+
+            background: #f1f5f9;
+
+            color: #333;
+
+            font-size: 22px;
+
             cursor: pointer;
         }
 
+        .service-details-image {
+
+            width: 100%;
+
+            height: 220px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #60a5fa
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 70px;
+
+            margin-bottom: 20px;
+
+            overflow: hidden;
+        }
+
+        .service-details-image img {
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .service-details-title {
+
+            margin:
+                0 40px 8px 0;
+
+            font-size: 25px;
+
+            color: #1e3a8a;
+        }
+
+        .service-details-category {
+
+            display: inline-block;
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+
+            margin-bottom: 18px;
+        }
+
+        .service-details-description {
+
+            color: #555;
+
+            line-height: 1.8;
+
+            margin-bottom: 20px;
+        }
+
+        .service-detail-row {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            padding: 13px 0;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+        .service-detail-icon {
+
+            font-size: 23px;
+
+            min-width: 32px;
+        }
+
+        .service-detail-info {
+
+            flex: 1;
+        }
+
+        .service-detail-info strong {
+
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: #222;
+        }
+
+        .service-detail-info span {
+
+            color: #666;
+
+            line-height: 1.6;
+        }
+
+        .service-phone-btn {
+
+            display: block;
+
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 14px;
+
+            border-radius: 12px;
+
+            background: #16a34a;
+
+            color: white;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+            font-size: 17px;
+
+            box-sizing: border-box;
+        }
+
+        .service-gallery {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+
+            margin-top: 18px;
+        }
+
+        .service-gallery img {
+
+            width: 100%;
+
+            height: 90px;
+
+            object-fit: cover;
+
+            border-radius: 10px;
+        }
+
+        .service-gallery-empty {
+
+            grid-column: 1 / -1;
+
+            background: #f8fafc;
+
+            padding: 20px;
+
+            text-align: center;
+
+            border-radius: 12px;
+
+            color: #888;
+        }
+
+        .service-card {
+
+            cursor: pointer;
+        }
+
+
+        /* =========================================
+           تحسين الموبايل
+        ========================================= */
+
         @media (max-width: 600px) {
+
             .modal-content {
+
                 padding: 18px;
+
                 max-height: 92vh;
             }
 
             .service-details-content {
+
                 padding: 18px;
+
+                max-height: 92vh;
             }
 
             .service-details-image {
+
                 height: 180px;
             }
+
+            .service-details-title {
+
+                font-size: 21px;
+            }
+
+            .service-gallery img {
+
+                height: 75px;
+            }
+
         }
+
     </style>
+
 </head>
 
+
 <body>
+
+
+<!-- =========================================
+     HEADER
+========================================= -->
 
 <header class="main-header">
 
     <div class="container header-content">
 
         <a href="#home" class="logo">
-            <span class="logo-icon">🏘️</span>
-            <span>أهل البلد</span>
+
+            <span class="logo-icon">
+                🏘️
+            </span>
+
+            <span>
+                أهل البلد
+            </span>
+
         </a>
 
+
         <nav class="main-nav">
-            <a href="#home">الرئيسية</a>
-            <a href="#categories">الأقسام</a>
-            <a href="#services">الخدمات</a>
-            <a href="#ads">الإعلانات</a>
-            <a href="#important-numbers">أرقام تهمك</a>
+
+            <a href="#home">
+                الرئيسية
+            </a>
+
+            <a href="#categories">
+                الأقسام
+            </a>
+
+            <a href="#services">
+                الخدمات
+            </a>
+
+            <a href="#ads">
+                الإعلانات
+            </a>
+
+            <a href="#important-numbers">
+                أرقام تهمك
+            </a>
+
         </nav>
+
 
         <div class="header-actions">
 
@@ -323,9 +595,15 @@
                 class="notification-btn"
                 id="notificationBtn"
                 type="button">
+
                 🔔
-                <span id="notificationCount">0</span>
+
+                <span id="notificationCount">
+                    0
+                </span>
+
             </button>
+
 
             <div id="accountArea">
 
@@ -333,7 +611,9 @@
                     class="login-btn"
                     id="loginBtn"
                     href="login.html">
+
                     👤 دخول
+
                 </a>
 
             </div>
@@ -345,28 +625,52 @@
 </header>
 
 
+
+<!-- =========================================
+     MAIN
+========================================= -->
+
 <main>
 
-<section class="hero" id="home">
+
+<!-- =========================================
+     HERO
+========================================= -->
+
+<section
+    class="hero"
+    id="home">
 
     <div class="container hero-content">
 
         <div class="hero-text">
 
             <span class="hero-badge">
+
                 🏡 كل احتياجات بلدك في مكان واحد
+
             </span>
 
+
             <h1>
+
                 أهلاً بيك في
-                <strong>أهل البلد</strong>
+
+                <strong>
+                    أهل البلد
+                </strong>
+
             </h1>
 
+
             <p>
+
                 ابحث عن الخدمات والمحلات والصيدليات
                 والعطارة والأرقام المهمة والإعلانات
                 الموجودة في بلدك.
+
             </p>
+
 
             <div class="hero-actions">
 
@@ -374,13 +678,18 @@
                     class="primary-btn"
                     id="addServiceHeroBtn"
                     type="button">
+
                     ➕ أضف خدمتك
+
                 </button>
+
 
                 <a
                     href="#categories"
                     class="secondary-btn">
+
                     استكشف الأقسام
+
                 </a>
 
             </div>
@@ -392,13 +701,21 @@
 </section>
 
 
+
+<!-- =========================================
+     SEARCH
+========================================= -->
+
 <section class="search-section">
 
     <div class="container">
 
         <div class="search-box">
 
-            <span class="search-icon">🔎</span>
+            <span class="search-icon">
+                🔎
+            </span>
+
 
             <input
                 type="search"
@@ -406,10 +723,13 @@
                 placeholder="ابحث عن خدمة، محل، صيدلية، عطارة..."
                 autocomplete="off">
 
+
             <button
                 id="searchBtn"
                 type="button">
+
                 بحث
+
             </button>
 
         </div>
@@ -419,85 +739,443 @@
 </section>
 
 
-<section class="section" id="categories">
+
+<!-- =========================================
+     CATEGORIES
+========================================= -->
+
+<section
+    class="section"
+    id="categories">
 
     <div class="container">
 
         <div class="section-heading">
 
-            <span>استكشف</span>
+            <span>
+                استكشف
+            </span>
 
-            <h2>أقسام أهل البلد</h2>
+            <h2>
+                أقسام أهل البلد
+            </h2>
 
-            <p>اختار القسم اللي بتدور عليه</p>
+            <p>
+                اختار القسم اللي بتدور عليه
+            </p>
 
         </div>
 
+
         <div class="categories-grid">
+
 
             <button
                 class="category-card"
                 data-category="services"
                 type="button">
 
-                <span class="category-icon">🛠️</span>
-                <h3>الخدمات</h3>
-                <p>صنايعية وحرفيين</p>
+                <span class="category-icon">
+                    🛠️
+                </span>
+
+                <h3>
+                    الخدمات
+                </h3>
+
+                <p>
+                    صنايعية وحرفيين
+                </p>
 
             </button>
+
+
 
             <button
                 class="category-card"
                 data-category="pharmacies"
                 type="button">
 
-                <span class="category-icon">💊</span>
-                <h3>الصيدليات</h3>
-                <p>صيدليات وأرقامها</p>
+                <span class="category-icon">
+                    💊
+                </span>
+
+                <h3>
+                    الصيدليات
+                </h3>
+
+                <p>
+                    صيدليات وأرقامها
+                </p>
 
             </button>
+
+
 
             <button
                 class="category-card"
                 data-category="herbal"
                 type="button">
 
-                <span class="category-icon">🌿</span>
-                <h3>العطارة</h3>
-                <p>عطارة ومنتجات طبيعية</p>
+                <span class="category-icon">
+                    🌿
+                </span>
+
+                <h3>
+                    العطارة
+                </h3>
+
+                <p>
+                    عطارة ومنتجات طبيعية
+                </p>
 
             </button>
+
+
 
             <button
                 class="category-card"
                 data-category="shops"
                 type="button">
 
-                <span class="category-icon">🛒</span>
-                <h3>المحلات</h3>
-                <p>محلات ومنتجات</p>
+                <span class="category-icon">
+                    🛒
+                </span>
+
+                <h3>
+                    المحلات
+                </h3>
+
+                <p>
+                    محلات ومنتجات
+                </p>
 
             </button>
+
+
 
             <button
                 class="category-card"
                 data-category="important-numbers"
                 type="button">
 
-                <span class="category-icon">📞</span>
-                <h3>أرقام تهمك</h3>
-                <p>أرقام وخدمات مهمة</p>
+                <span class="category-icon">
+                    📞
+                </span>
+
+                <h3>
+                    أرقام تهمك
+                </h3>
+
+                <p>
+                    أرقام وخدمات مهمة
+                </p>
 
             </button>
+
+
 
             <button
                 class="category-card"
                 data-category="ads"
                 type="button">
 
-                <span class="category-icon">📢</span>
-                <h3>الإعلانات</h3>
-                <p>أحدث الإعلانات</p>
+                <span class="category-icon">
+                    📢
+                </span>
+
+                <h3>
+                    الإعلانات
+                </h3>
+
+                <p>
+                    أحدث الإعلانات
+                </p>
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     SERVICES
+========================================= -->
+
+<section
+    class="section services-section"
+    id="services">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span>
+                اكتشف
+            </span>
+
+            <h2>
+                أحدث الخدمات
+            </h2>
+
+            <p>
+                اضغط على أي خدمة لعرض التفاصيل
+            </p>
+
+        </div>
+
+
+        <div
+            class="services-grid"
+            id="servicesContainer">
+
+            <div class="empty-state">
+
+                <span>
+                    🛠️
+                </span>
+
+                <h3>
+                    جاري تحميل الخدمات...
+                </h3>
+
+                <p>
+                    انتظر قليلًا
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     IMPORTANT NUMBERS
+========================================= -->
+
+<section
+    class="section important-section"
+    id="important-numbers">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span>
+                معلومات مهمة
+            </span>
+
+            <h2>
+                أرقام تهمك
+            </h2>
+
+            <p>
+                أرقام وخدمات مهمة لأهل البلد
+            </p>
+
+        </div>
+
+
+        <div class="numbers-grid">
+
+
+            <div class="number-card">
+
+                <span class="number-icon">
+                    🚑
+                </span>
+
+                <div>
+
+                    <h3>
+                        الإسعاف
+                    </h3>
+
+                    <p>
+                        رقم الطوارئ
+                    </p>
+
+                </div>
+
+                <a
+                    href="tel:123"
+                    class="call-btn">
+
+                    📞 اتصال
+
+                </a>
+
+            </div>
+
+
+
+            <div class="number-card">
+
+                <span class="number-icon">
+                    🚒
+                </span>
+
+                <div>
+
+                    <h3>
+                        المطافي
+                    </h3>
+
+                    <p>
+                        الطوارئ
+                    </p>
+
+                </div>
+
+                <a
+                    href="tel:180"
+                    class="call-btn">
+
+                    📞 اتصال
+
+                </a>
+
+            </div>
+
+
+
+            <div class="number-card">
+
+                <span class="number-icon">
+                    👮
+                </span>
+
+                <div>
+
+                    <h3>
+                        الشرطة
+                    </h3>
+
+                    <p>
+                        الطوارئ
+                    </p>
+
+                </div>
+
+                <a
+                    href="tel:122"
+                    class="call-btn">
+
+                    📞 اتصال
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     ADS
+========================================= -->
+
+<section
+    class="section ads-section"
+    id="ads">
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <span>
+                جديد البلد
+            </span>
+
+            <h2>
+                آخر الإعلانات
+            </h2>
+
+            <p>
+                إعلانات يتم اعتمادها ونشرها من إدارة الموقع
+            </p>
+
+        </div>
+
+
+        <div
+            class="ads-grid"
+            id="adsContainer">
+
+            <div class="empty-state">
+
+                <span>
+                    📢
+                </span>
+
+                <h3>
+                    لا توجد إعلانات حاليًا
+                </h3>
+
+                <p>
+                    سيتم عرض الإعلانات الجديدة هنا
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================
+     ADD SERVICE
+========================================= -->
+
+<section class="add-section">
+
+    <div class="container">
+
+        <div class="add-card">
+
+            <div>
+
+                <span class="add-icon">
+                    ➕
+                </span>
+
+                <h2>
+                    عندك خدمة أو محل؟
+                </h2>
+
+                <p>
+
+                    أضف بياناتك ليتم مراجعتها
+                    من إدارة أهل البلد.
+
+                </p>
+
+            </div>
+
+
+            <button
+                id="addServiceBtn"
+                class="primary-btn"
+                type="button">
+
+                إضافة الآن
 
             </button>
 
@@ -508,4 +1186,947 @@
 </section>
 
 
-<section
+</main>
+
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer class="main-footer">
+
+    <div class="container">
+
+        <div class="footer-content">
+
+
+            <div class="footer-about">
+
+                <div class="logo">
+
+                    🏘️ أهل البلد
+
+                </div>
+
+                <p>
+
+                    منصة لخدمة أهل البلد
+                    وجمع الخدمات والمعلومات
+                    المهمة في مكان واحد.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+                <h3>
+                    روابط مهمة
+                </h3>
+
+                <a href="#home">
+                    الرئيسية
+                </a>
+
+                <a href="#categories">
+                    الأقسام
+                </a>
+
+                <a href="#services">
+                    الخدمات
+                </a>
+
+                <a href="#ads">
+                    الإعلانات
+                </a>
+
+                <a href="#important-numbers">
+                    أرقام تهمك
+                </a>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+                <h3>
+                    المساعدة
+                </h3>
+
+                <a href="#">
+                    تواصل معنا
+                </a>
+
+                <a href="#">
+                    شروط الاستخدام
+                </a>
+
+                <a href="#">
+                    سياسة الخصوصية
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <p>
+
+                © 2026 أهل البلد
+                - جميع الحقوق محفوظة
+
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================
+     ADD SERVICE MODAL
+========================================= -->
+
+<div
+    class="modal"
+    id="addServiceModal"
+    aria-hidden="true">
+
+
+    <div class="modal-overlay"></div>
+
+
+    <div class="modal-content">
+
+
+        <button
+            class="modal-close"
+            id="closeModalBtn"
+            type="button">
+
+            ✕
+
+        </button>
+
+
+        <div class="modal-header">
+
+            <span>
+                ➕
+            </span>
+
+            <h2>
+                إضافة خدمة
+            </h2>
+
+            <p>
+                سيتم مراجعة البيانات قبل نشرها.
+            </p>
+
+        </div>
+
+
+
+        <form id="addServiceForm">
+
+
+            <div class="form-group">
+
+                <label for="serviceName">
+                    اسم الخدمة
+                </label>
+
+                <input
+                    type="text"
+                    id="serviceName"
+                    placeholder="مثال: سباك أحمد"
+                    required>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="serviceCategory">
+                    القسم
+                </label>
+
+                <select
+                    id="serviceCategory"
+                    required>
+
+                    <option value="">
+                        اختر القسم
+                    </option>
+
+                    <option value="services">
+                        الخدمات
+                    </option>
+
+                    <option value="pharmacies">
+                        الصيدليات
+                    </option>
+
+                    <option value="herbal">
+                        العطارة
+                    </option>
+
+                    <option value="shops">
+                        المحلات
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="serviceDescription">
+                    وصف الخدمة
+                </label>
+
+                <textarea
+                    id="serviceDescription"
+                    rows="4"
+                    placeholder="اكتب وصفًا للخدمة..."
+                    required></textarea>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="servicePhone">
+                    رقم الهاتف
+                </label>
+
+                <input
+                    type="tel"
+                    id="servicePhone"
+                    placeholder="01xxxxxxxxx"
+                    required>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="serviceAddress">
+                    العنوان
+                </label>
+
+                <input
+                    type="text"
+                    id="serviceAddress"
+                    placeholder="اكتب العنوان"
+                    required>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="serviceWorkingHours">
+                    مواعيد العمل
+                </label>
+
+                <input
+                    type="text"
+                    id="serviceWorkingHours"
+                    placeholder="مثال: يوميًا من 9 صباحًا إلى 10 مساءً">
+
+            </div>
+
+
+
+            <button
+                type="submit"
+                class="primary-btn submit-btn">
+
+                إرسال للمراجعة
+
+            </button>
+
+
+            <p class="form-note">
+
+                لن تظهر الخدمة للمستخدمين
+                إلا بعد موافقة الإدارة.
+
+            </p>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================
+     SERVICE DETAILS MODAL
+========================================= -->
+
+<div
+    class="service-details-modal"
+    id="serviceDetailsModal"
+    aria-hidden="true">
+
+
+    <div
+        class="service-details-overlay"
+        id="serviceDetailsOverlay">
+    </div>
+
+
+    <div class="service-details-content">
+
+
+        <button
+            class="service-details-close"
+            id="serviceDetailsClose"
+            type="button"
+            aria-label="إغلاق">
+
+            ✕
+
+        </button>
+
+
+        <div
+            class="service-details-image"
+            id="detailsImage">
+
+            🏪
+
+        </div>
+
+
+        <h2
+            class="service-details-title"
+            id="detailsName">
+
+            اسم الخدمة
+
+        </h2>
+
+
+        <span
+            class="service-details-category"
+            id="detailsCategory">
+
+            الخدمات
+
+        </span>
+
+
+        <p
+            class="service-details-description"
+            id="detailsDescription">
+        </p>
+
+
+
+        <div class="service-detail-row">
+
+            <span class="service-detail-icon">
+                📍
+            </span>
+
+            <div class="service-detail-info">
+
+                <strong>
+                    العنوان
+                </strong>
+
+                <span id="detailsAddress">
+                    غير متوفر
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="service-detail-row">
+
+            <span class="service-detail-icon">
+                📞
+            </span>
+
+            <div class="service-detail-info">
+
+                <strong>
+                    رقم الهاتف
+                </strong>
+
+                <span id="detailsPhone">
+                    غير متوفر
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="service-detail-row">
+
+            <span class="service-detail-icon">
+                🕐
+            </span>
+
+            <div class="service-detail-info">
+
+                <strong>
+                    مواعيد العمل
+                </strong>
+
+                <span id="detailsWorkingHours">
+                    لم يتم تحديد مواعيد العمل
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <div
+            class="service-gallery"
+            id="detailsGallery">
+
+            <div class="service-gallery-empty">
+
+                🖼️ لا توجد صور مضافة حاليًا
+
+            </div>
+
+        </div>
+
+
+
+        <a
+            href="#"
+            id="detailsCallButton"
+            class="service-phone-btn">
+
+            📞 اتصال بالخدمة
+
+        </a>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================
+     FIREBASE
+========================================= -->
+
+<script type="module">
+
+
+    import {
+        initializeApp
+    } from
+    "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+
+    import {
+        getAuth,
+        onAuthStateChanged,
+        signOut
+    } from
+    "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+
+    import {
+        getDatabase,
+        ref,
+        get
+    } from
+    "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+
+
+    const firebaseConfig = {
+
+        apiKey:
+            "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+        authDomain:
+            "ahl-elbaled2.firebaseapp.com",
+
+        databaseURL:
+            "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+        projectId:
+            "ahl-elbaled2",
+
+        storageBucket:
+            "ahl-elbaled2.firebasestorage.app",
+
+        messagingSenderId:
+            "984455426367",
+
+        appId:
+            "1:984455426367:web:5420f680f2a4f9b609238a",
+
+        measurementId:
+            "G-NQFQWK5T57"
+
+    };
+
+
+
+    const app =
+        initializeApp(firebaseConfig);
+
+
+    const auth =
+        getAuth(app);
+
+
+    const database =
+        getDatabase(app);
+
+
+
+    const accountArea =
+        document.getElementById(
+            "accountArea"
+        );
+
+
+
+    onAuthStateChanged(
+        auth,
+        async (user) => {
+
+
+            if (!user) {
+
+                accountArea.innerHTML = `
+
+                    <a
+                        class="login-btn"
+                        href="login.html">
+
+                        👤 دخول
+
+                    </a>
+
+                `;
+
+                return;
+
+            }
+
+
+
+            try {
+
+
+                const userRef =
+                    ref(
+                        database,
+                        "users/" + user.uid
+                    );
+
+
+                const snapshot =
+                    await get(userRef);
+
+
+
+                if (!snapshot.exists()) {
+
+                    accountArea.innerHTML = `
+
+                        <a
+                            class="login-btn"
+                            href="login.html">
+
+                            👤 دخول
+
+                        </a>
+
+                    `;
+
+                    return;
+
+                }
+
+
+
+                const userData =
+                    snapshot.val();
+
+
+
+                if (
+                    userData.status !==
+                    "approved"
+                ) {
+
+                    accountArea.innerHTML = `
+
+                        <span style="
+                            color:#777;
+                            font-weight:bold;
+                            padding:8px;
+                        ">
+
+                            ⏳ الحساب قيد المراجعة
+
+                        </span>
+
+                    `;
+
+                    return;
+
+                }
+
+
+
+                let adminButton = "";
+
+
+
+                if (
+                    userData.role ===
+                    "admin"
+                ) {
+
+                    adminButton = `
+
+                        <a
+                            href="admin.html"
+                            class="login-btn"
+                            style="
+                                text-decoration:none;
+                                margin-left:5px;
+                            ">
+
+                            🛠️ لوحة الإدارة
+
+                        </a>
+
+                    `;
+
+                }
+
+
+
+                accountArea.innerHTML = `
+
+                    ${adminButton}
+
+
+                    <span style="
+                        display:inline-block;
+                        margin:0 5px;
+                        font-weight:bold;
+                        color:#333;
+                    ">
+
+                        👤
+
+                        ${escapeHTML(
+                            userData.name ||
+                            "المستخدم"
+                        )}
+
+                        #
+
+                        ${userData.accountNumber || ""}
+
+                    </span>
+
+
+                    <button
+                        id="logoutBtn"
+                        type="button"
+                        class="login-btn"
+                        style="
+                            border:0;
+                            cursor:pointer;
+                        ">
+
+                        خروج
+
+                    </button>
+
+                `;
+
+
+
+                const logoutBtn =
+                    document.getElementById(
+                        "logoutBtn"
+                    );
+
+
+
+                if (logoutBtn) {
+
+                    logoutBtn.addEventListener(
+                        "click",
+                        async () => {
+
+                            await signOut(auth);
+
+                            window.location.href =
+                                "index.html";
+
+                        }
+                    );
+
+                }
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Firebase Auth Error:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+
+
+    function escapeHTML(value) {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.textContent =
+            value || "";
+
+        return div.innerHTML;
+
+    }
+
+
+</script>
+
+
+
+<!-- =========================================
+     ADD SERVICE MODAL CONTROL
+     ده المسؤول عن تشغيل زرار إضافة الخدمة
+========================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const modal =
+            document.getElementById(
+                "addServiceModal"
+            );
+
+
+        const addServiceBtn =
+            document.getElementById(
+                "addServiceBtn"
+            );
+
+
+        const addServiceHeroBtn =
+            document.getElementById(
+                "addServiceHeroBtn"
+            );
+
+
+        const closeModalBtn =
+            document.getElementById(
+                "closeModalBtn"
+            );
+
+
+        const modalOverlay =
+            modal
+            ? modal.querySelector(
+                ".modal-overlay"
+            )
+            : null;
+
+
+
+        function openAddServiceModal() {
+
+
+            if (!modal) {
+
+                console.error(
+                    "نافذة إضافة الخدمة غير موجودة"
+                );
+
+                return;
+
+            }
+
+
+            modal.classList.add(
+                "active"
+            );
+
+
+            modal.style.display =
+                "flex";
+
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+
+            document.body.style.overflow =
+                "hidden";
+
+        }
+
+
+
+        function closeAddServiceModal() {
+
+
+            if (!modal) return;
+
+
+            modal.classList.remove(
+                "active"
+            );
+
+
+            modal.style.display =
+                "none";
+
+
+            modal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+
+            document.body.style.overflow =
+                "";
+
+        }
+
+
+
+        if (addServiceBtn) {
+
+            addServiceBtn.addEventListener(
+                "click",
+                openAddServiceModal
+            );
+
+        }
+
+
+
+        if (addServiceHeroBtn) {
+
+            addServiceHeroBtn.addEventListener(
+                "click",
+                openAddServiceModal
+            );
+
+        }
+
+
+
+        if (closeModalBtn) {
+
+            closeModalBtn.addEventListener(
+                "click",
+                closeAddServiceModal
+            );
+
+        }
+
+
+
+        if (modalOverlay) {
+
+            modalOverlay.addEventListener(
+                "click",
+                closeAddServiceModal
+            );
+
+        }
+
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
+
+                    closeAddServiceModal();
+
+                }
+
+            }
+        );
+
+
+    }
+);
+
+</script>
+
+
+
+<!-- =========================================
+     SCRIPT.JS
+========================================= -->
+
+<script
+    type="module"
+    src="script.js">
+</script>
+
+
+</body>
+
+    </html>
