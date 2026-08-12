@@ -1,4 +1,4 @@
-import {
+ import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
@@ -1644,6 +1644,544 @@ function escapeHTML(
    تشغيل
 ===================================== */
 
+/* =====================================
+   البحث في الخدمات
+===================================== */
+
+const searchInput =
+    document.getElementById(
+        "searchInput"
+    );
+
+const searchBtn =
+    document.getElementById(
+        "searchBtn"
+    );
+
+
+/* =====================================
+   تنظيف النص قبل البحث
+===================================== */
+
+function normalizeSearchText(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    return String(value)
+        .toLowerCase()
+        .trim()
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ة/g, "ه")
+        .replace(/ى/g, "ي");
+
+}
+
+
+/* =====================================
+   تنفيذ البحث
+===================================== */
+
+function searchServices() {
+
+    if (!servicesContainer) {
+        return;
+    }
+
+
+    const searchText =
+        normalizeSearchText(
+            searchInput
+                ? searchInput.value
+                : ""
+        );
+
+
+    /* لو البحث فاضي */
+    if (!searchText) {
+
+        renderServices(
+            allServices
+        );
+
+        return;
+
+    }
+
+
+    servicesContainer.innerHTML = "";
+
+
+    let count = 0;
+
+
+    Object.entries(
+        allServices || {}
+    ).forEach(
+        ([id, service]) => {
+
+
+            /* تجاهل الخدمة غير الموجودة */
+            if (!service) {
+                return;
+            }
+
+
+            /* عرض الخدمات المقبولة فقط */
+            if (
+                service.status !==
+                "approved"
+            ) {
+                return;
+            }
+
+
+            const serviceName =
+                normalizeSearchText(
+                    service.name
+                );
+
+
+            const serviceCategory =
+                normalizeSearchText(
+                    getCategoryName(
+                        service.category
+                    )
+                );
+
+
+            const serviceDescription =
+                normalizeSearchText(
+                    service.description
+                );
+
+
+            const serviceAddress =
+                normalizeSearchText(
+                    service.address
+                );
+
+
+            const servicePhone =
+                normalizeSearchText(
+                    service.phone
+                );
+
+
+            const serviceWorkingHours =
+                normalizeSearchText(
+                    service.workingHours
+                );
+
+
+            /*
+             * البحث في:
+             *
+             * اسم الخدمة
+             * القسم
+             * الوصف
+             * العنوان
+             * رقم الهاتف
+             * مواعيد العمل
+             */
+
+            const found =
+                serviceName.includes(
+                    searchText
+                ) ||
+
+                serviceCategory.includes(
+                    searchText
+                ) ||
+
+                serviceDescription.includes(
+                    searchText
+                ) ||
+
+                serviceAddress.includes(
+                    searchText
+                ) ||
+
+                servicePhone.includes(
+                    searchText
+                ) ||
+
+                serviceWorkingHours.includes(
+                    searchText
+                );
+
+
+            if (!found) {
+                return;
+            }
+
+
+            count++;
+
+
+            /* =================================
+               إنشاء كارت الخدمة
+            ================================= */
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "service-card";
+
+
+            card.dataset.serviceId =
+                id;
+
+
+            let serviceIcon =
+                "🛠️";
+
+
+            if (
+                service.category ===
+                "craftsmen"
+            ) {
+
+                serviceIcon =
+                    "🔨";
+
+            }
+
+            else if (
+                service.category ===
+                "pharmacies"
+            ) {
+
+                serviceIcon =
+                    "💊";
+
+            }
+
+            else if (
+                service.category ===
+                "herbal"
+            ) {
+
+                serviceIcon =
+                    "🌿";
+
+            }
+
+            else if (
+                service.category ===
+                "shops"
+            ) {
+
+                serviceIcon =
+                    "🛒";
+
+            }
+
+            else if (
+                service.category ===
+                "services"
+            ) {
+
+                serviceIcon =
+                    "🛠️";
+
+            }
+
+
+            card.innerHTML = `
+
+                <div class="service-image">
+
+                    ${serviceIcon}
+
+                </div>
+
+
+                <div class="service-content">
+
+                    <h3>
+
+                        ${escapeHTML(
+                            service.name ||
+                            "خدمة بدون اسم"
+                        )}
+
+                    </h3>
+
+
+                    <p>
+
+                        ${escapeHTML(
+                            service.description ||
+                            "لا يوجد وصف للخدمة."
+                        )}
+
+                    </p>
+
+
+                    <div class="service-meta">
+
+                        <span class="meta-item">
+
+                            📍
+
+                            ${escapeHTML(
+                                service.address ||
+                                "العنوان غير متوفر"
+                            )}
+
+                        </span>
+
+
+                        <span class="meta-item">
+
+                            📞
+
+                            ${escapeHTML(
+                                service.phone ||
+                                "رقم الهاتف غير متوفر"
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <div style="
+                        margin-top:12px;
+                        color:#2563eb;
+                        font-weight:bold;
+                        font-size:14px;
+                    ">
+
+                        👆 اضغط لعرض التفاصيل
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            /* =================================
+               فتح تفاصيل الخدمة
+            ================================= */
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    openServiceDetails(
+                        service
+                    );
+
+                }
+            );
+
+
+            servicesContainer.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    /* =================================
+       لا توجد نتائج
+    ================================= */
+
+    if (count === 0) {
+
+        servicesContainer.innerHTML = `
+
+            <div class="empty-state">
+
+                <span>
+                    🔎
+                </span>
+
+
+                <h3>
+                    لا توجد نتائج
+                </h3>
+
+
+                <p>
+
+                    لم نجد خدمة مطابقة لـ:
+
+                    <strong>
+                        ${escapeHTML(
+                            searchInput
+                                ? searchInput.value
+                                : ""
+                        )}
+                    </strong>
+
+                </p>
+
+
+                <button
+                    type="button"
+                    id="clearSearchBtn"
+                    style="
+                        margin-top:15px;
+                        padding:10px 20px;
+                        border:0;
+                        border-radius:10px;
+                        background:#2563eb;
+                        color:white;
+                        cursor:pointer;
+                        font-family:inherit;
+                        font-weight:bold;
+                    ">
+
+                    مسح البحث
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        const clearSearchBtn =
+            document.getElementById(
+                "clearSearchBtn"
+            );
+
+
+        if (clearSearchBtn) {
+
+            clearSearchBtn.addEventListener(
+                "click",
+                () => {
+
+                    if (searchInput) {
+
+                        searchInput.value =
+                            "";
+
+                    }
+
+
+                    renderServices(
+                        allServices
+                    );
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =================================
+       الانتقال للخدمات بعد البحث
+    ================================= */
+
+    const servicesSection =
+        document.getElementById(
+            "services"
+        );
+
+
+    if (servicesSection) {
+
+        servicesSection.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+}
+
+
+/* =====================================
+   الضغط على زر البحث
+===================================== */
+
+if (searchBtn) {
+
+    searchBtn.addEventListener(
+        "click",
+        searchServices
+    );
+
+}
+
+
+/* =====================================
+   البحث أثناء الكتابة
+===================================== */
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+        "input",
+        () => {
+
+            const value =
+                searchInput.value.trim();
+
+
+            /*
+             * لو المستخدم مسح
+             * مربع البحث
+             * نرجع كل الخدمات
+             */
+
+            if (!value) {
+
+                renderServices(
+                    allServices
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =================================
+       البحث بزر Enter
+    ================================= */
+
+    searchInput.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                searchServices();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================
+   نهاية البحث
+===================================== */
+
+console.log(
+    "نظام البحث في أهل البلد يعمل بنجاح 🔎✅"
+);
 console.log(
     "أهل البلد - script.js يعمل بنجاح ✅"
 );
