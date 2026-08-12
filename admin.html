@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>لوحة الإدارة - أهل البلد</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -44,7 +49,7 @@
     }
 
     main {
-      max-width: 900px;
+      max-width: 950px;
       margin: 25px auto;
       padding: 0 15px;
     }
@@ -53,13 +58,19 @@
       background: white;
       padding: 15px;
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       box-shadow: 0 2px 10px rgba(0,0,0,.06);
     }
 
     #adminStatus {
       color: #16a34a;
       font-weight: bold;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      color: #222;
     }
 
     .request {
@@ -73,6 +84,16 @@
     .request h3 {
       margin-top: 0;
       color: #2563eb;
+    }
+
+    .account-number {
+      display: inline-block;
+      background: #eff6ff;
+      color: #2563eb;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-bottom: 12px;
     }
 
     .info {
@@ -111,6 +132,7 @@
       text-align: center;
       border-radius: 14px;
       color: #777;
+      margin-bottom: 20px;
     }
 
     .loading {
@@ -118,7 +140,14 @@
       padding: 25px;
     }
 
+    .divider {
+      height: 2px;
+      background: #e5e7eb;
+      margin: 35px 0;
+    }
+
     @media (max-width: 600px) {
+
       header {
         flex-direction: column;
       }
@@ -130,410 +159,1039 @@
       .actions button {
         width: 100%;
       }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
 <header>
-  <h1>🏠 لوحة إدارة أهل البلد</h1>
+
+  <h1>
+    🏠 لوحة إدارة أهل البلد
+  </h1>
 
   <button id="logoutBtn">
     تسجيل الخروج
   </button>
+
 </header>
 
 
 <main>
 
+
+  <!-- حالة الإدارة -->
+
   <div class="status">
-    <strong>حالة الإدارة:</strong>
+
+    <strong>
+      حالة الإدارة:
+    </strong>
+
     <span id="adminStatus">
       جاري التحقق...
     </span>
+
   </div>
 
 
-  <h2>طلبات الخدمات</h2>
+  <!-- =====================================
+       طلبات إنشاء الحسابات
+  ====================================== -->
+
+  <h2 class="section-title">
+    👤 طلبات إنشاء الحسابات
+  </h2>
 
 
-  <div id="requestsContainer">
+  <div id="usersContainer">
+
     <div class="loading">
-      جاري تحميل الطلبات...
+      جاري تحميل طلبات الحسابات...
     </div>
+
   </div>
+
+
+  <div class="divider"></div>
+
+
+  <!-- =====================================
+       طلبات الخدمات
+  ====================================== -->
+
+  <h2 class="section-title">
+    🛠️ طلبات الخدمات
+  </h2>
+
+
+  <div id="servicesContainer">
+
+    <div class="loading">
+      جاري تحميل طلبات الخدمات...
+    </div>
+
+  </div>
+
 
 </main>
 
 
 <script type="module">
 
-  // ==========================================
-  // Firebase
-  // ==========================================
 
-  import {
-    initializeApp
-  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+/* =========================================
+   Firebase
+========================================= */
 
 
-  import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
 
-  import {
-    getDatabase,
-    ref,
-    onValue,
-    update
-  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 
-  // ==========================================
-  // إعدادات Firebase
-  // ==========================================
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
-    authDomain: "ahl-elbaled2.firebaseapp.com",
-    databaseURL: "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "ahl-elbaled2",
-    storageBucket: "ahl-elbaled2.firebasestorage.app",
-    messagingSenderId: "984455426367",
-    appId: "1:984455426367:web:5420f680f2a4f9b609238a",
-    measurementId: "G-NQFQWK5T57"
-  };
+import {
+  getDatabase,
+  ref,
+  onValue,
+  update
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
-  // ==========================================
-  // تشغيل Firebase
-  // ==========================================
-
-  const app = initializeApp(firebaseConfig);
-
-  const auth = getAuth(app);
-
-  const database = getDatabase(app);
+/* =========================================
+   Firebase Config
+========================================= */
 
 
-  // ==========================================
-  // عناصر الصفحة
-  // ==========================================
+const firebaseConfig = {
 
-  const requestsContainer =
-    document.getElementById("requestsContainer");
+  apiKey:
+    "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
 
-  const adminStatus =
-    document.getElementById("adminStatus");
+  authDomain:
+    "ahl-elbaled2.firebaseapp.com",
 
-  const logoutBtn =
-    document.getElementById("logoutBtn");
+  databaseURL:
+    "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+  projectId:
+    "ahl-elbaled2",
+
+  storageBucket:
+    "ahl-elbaled2.firebasestorage.app",
+
+  messagingSenderId:
+    "984455426367",
+
+  appId:
+    "1:984455426367:web:5420f680f2a4f9b609238a",
+
+  measurementId:
+    "G-NQFQWK5T57"
+
+};
 
 
-  // ==========================================
-  // التأكد من تسجيل الدخول
-  // ==========================================
+/* =========================================
+   تشغيل Firebase
+========================================= */
 
-  onAuthStateChanged(auth, (user) => {
+
+const app =
+  initializeApp(firebaseConfig);
+
+
+const auth =
+  getAuth(app);
+
+
+const database =
+  getDatabase(app);
+
+
+/* =========================================
+   عناصر الصفحة
+========================================= */
+
+
+const adminStatus =
+  document.getElementById(
+    "adminStatus"
+  );
+
+
+const usersContainer =
+  document.getElementById(
+    "usersContainer"
+  );
+
+
+const servicesContainer =
+  document.getElementById(
+    "servicesContainer"
+  );
+
+
+const logoutBtn =
+  document.getElementById(
+    "logoutBtn"
+  );
+
+
+/* =========================================
+   التأكد أن المستخدم أدمن
+========================================= */
+
+
+onAuthStateChanged(
+  auth,
+  async (user) => {
 
     if (!user) {
 
-      window.location.href = "login.html";
+      window.location.href =
+        "login.html";
 
       return;
+
     }
 
 
-    adminStatus.textContent =
-      "تم تسجيل الدخول كمسؤول ✅";
+    /*
+     * نجيب بيانات المستخدم
+     * من Realtime Database
+     */
 
-
-    loadRequests();
-
-  });
-
-
-  // ==========================================
-  // تحميل الطلبات المعلقة
-  // ==========================================
-
-  function loadRequests() {
-
-    const servicesRef =
-      ref(database, "services");
+    const userRef =
+      ref(
+        database,
+        "users/" + user.uid
+      );
 
 
     onValue(
-      servicesRef,
+      userRef,
       (snapshot) => {
 
-        const data = snapshot.val();
+        if (!snapshot.exists()) {
 
-        requestsContainer.innerHTML = "";
+          adminStatus.textContent =
+            "بيانات الحساب غير موجودة ❌";
 
+          setTimeout(() => {
 
-        if (!data) {
+            window.location.href =
+              "index.html";
 
-          requestsContainer.innerHTML = `
-            <div class="empty">
-              لا توجد طلبات حاليًا.
-            </div>
-          `;
+          }, 1500);
 
           return;
+
         }
 
 
-        let pendingCount = 0;
+        const userData =
+          snapshot.val();
 
 
-        Object.entries(data).forEach(
-          ([id, service]) => {
+        /*
+         * التأكد من أن الحساب أدمن
+         */
 
-            if (
-              service.status !== "pending"
-            ) {
-              return;
-            }
+        if (
+          userData.role !== "admin"
+        ) {
 
+          adminStatus.textContent =
+            "ليس لديك صلاحيات الإدارة ❌";
 
-            pendingCount++;
+          setTimeout(() => {
 
+            window.location.href =
+              "index.html";
 
-            const request =
-              document.createElement("div");
+          }, 1500);
 
+          return;
 
-            request.className =
-              "request";
-
-
-            request.innerHTML = `
-
-              <h3>
-                ${escapeHTML(service.name)}
-              </h3>
-
-              <div class="info">
-                <strong>التصنيف:</strong>
-                ${escapeHTML(service.category)}
-              </div>
-
-              <div class="info">
-                <strong>الوصف:</strong>
-                ${escapeHTML(service.description)}
-              </div>
-
-              <div class="info">
-                <strong>الهاتف:</strong>
-                ${escapeHTML(service.phone)}
-              </div>
-
-              <div class="info">
-                <strong>العنوان:</strong>
-                ${escapeHTML(service.address)}
-              </div>
-
-              <div class="actions">
-
-                <button
-                  class="approve"
-                  data-id="${id}">
-                  ✅ موافقة
-                </button>
-
-                <button
-                  class="reject"
-                  data-id="${id}">
-                  ❌ رفض
-                </button>
-
-              </div>
-            `;
+        }
 
 
-            requestsContainer.appendChild(
-              request
+        /*
+         * التأكد أن الأدمن نفسه معتمد
+         */
+
+        if (
+          userData.status !== "approved"
+        ) {
+
+          adminStatus.textContent =
+            "حساب الإدارة غير معتمد ❌";
+
+          setTimeout(() => {
+
+            window.location.href =
+              "index.html";
+
+          }, 1500);
+
+          return;
+
+        }
+
+
+        adminStatus.textContent =
+          "تم تسجيل الدخول كمسؤول ✅";
+
+
+        /*
+         * تحميل الطلبات
+         */
+
+        loadUsers();
+
+        loadServices();
+
+      }
+    );
+
+  }
+);
+
+
+/* =========================================
+   تحميل طلبات الحسابات
+========================================= */
+
+
+function loadUsers() {
+
+
+  const usersRef =
+    ref(
+      database,
+      "users"
+    );
+
+
+  onValue(
+
+    usersRef,
+
+    (snapshot) => {
+
+
+      usersContainer.innerHTML =
+        "";
+
+
+      const data =
+        snapshot.val();
+
+
+      if (!data) {
+
+        usersContainer.innerHTML = `
+
+          <div class="empty">
+
+            لا توجد حسابات مسجلة حاليًا.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      let pendingCount =
+        0;
+
+
+      Object.entries(data).forEach(
+
+        ([uid, user]) => {
+
+
+          /*
+           * نعرض الحسابات
+           * التي تنتظر موافقة الإدارة فقط
+           */
+
+          if (
+            user.status !== "pending"
+          ) {
+
+            return;
+
+          }
+
+
+          pendingCount++;
+
+
+          const request =
+            document.createElement(
+              "div"
+            );
+
+
+          request.className =
+            "request";
+
+
+          request.innerHTML = `
+
+            <h3>
+              👤 ${escapeHTML(
+                user.name
+              )}
+            </h3>
+
+            <div class="account-number">
+
+              رقم الحساب:
+              ${escapeHTML(
+                String(
+                  user.accountNumber || "غير محدد"
+                )
+              )}
+
+            </div>
+
+            <div class="info">
+
+              <strong>
+                البريد الإلكتروني:
+              </strong>
+
+              ${escapeHTML(
+                user.email
+              )}
+
+            </div>
+
+            <div class="info">
+
+              <strong>
+                نوع الحساب:
+              </strong>
+
+              مستخدم
+
+            </div>
+
+            <div class="actions">
+
+              <button
+                class="approve"
+                data-uid="${uid}">
+
+                ✅ الموافقة على الحساب
+
+              </button>
+
+              <button
+                class="reject"
+                data-uid="${uid}">
+
+                ❌ رفض الحساب
+
+              </button>
+
+            </div>
+
+          `;
+
+
+          usersContainer.appendChild(
+            request
+          );
+
+        }
+
+      );
+
+
+      if (
+        pendingCount === 0
+      ) {
+
+        usersContainer.innerHTML = `
+
+          <div class="empty">
+
+            لا توجد طلبات إنشاء حسابات معلقة حاليًا ✅
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      /*
+       * أزرار الموافقة
+       */
+
+      document
+        .querySelectorAll(
+          ".approve"
+        )
+        .forEach(
+          (button) => {
+
+            button.addEventListener(
+              "click",
+              () => {
+
+                approveUser(
+                  button.dataset.uid
+                );
+
+              }
             );
 
           }
         );
 
 
-        if (pendingCount === 0) {
+      /*
+       * أزرار الرفض
+       */
 
-          requestsContainer.innerHTML = `
-            <div class="empty">
-              لا توجد طلبات معلقة حاليًا ✅
-            </div>
-          `;
-
-          return;
-        }
-
-
-        // ======================================
-        // زر الموافقة
-        // ======================================
-
-        document
-          .querySelectorAll(".approve")
-          .forEach((button) => {
+      document
+        .querySelectorAll(
+          ".reject"
+        )
+        .forEach(
+          (button) => {
 
             button.addEventListener(
               "click",
               () => {
 
-                changeStatus(
-                  button.dataset.id,
-                  "approved"
+                rejectUser(
+                  button.dataset.uid
                 );
 
               }
             );
 
-          });
+          }
+        );
+
+    },
+
+    (error) => {
+
+      console.error(error);
+
+      usersContainer.innerHTML = `
+
+        <div class="empty">
+
+          حدث خطأ أثناء تحميل طلبات الحسابات ❌
+
+        </div>
+
+      `;
+
+    }
+
+  );
+
+}
 
 
-        // ======================================
-        // زر الرفض
-        // ======================================
+/* =========================================
+   الموافقة على حساب
+========================================= */
 
-        document
-          .querySelectorAll(".reject")
-          .forEach((button) => {
 
-            button.addEventListener(
-              "click",
-              () => {
+async function approveUser(
+  uid
+) {
 
-                changeStatus(
-                  button.dataset.id,
-                  "rejected"
-                );
+  try {
 
-              }
-            );
+    await update(
 
-          });
+      ref(
+        database,
+        "users/" + uid
+      ),
 
-      },
-
-      (error) => {
-
-        console.error(error);
-
-        requestsContainer.innerHTML = `
-          <div class="empty">
-            حدث خطأ أثناء تحميل الطلبات.
-          </div>
-        `;
-
+      {
+        status:
+          "approved"
       }
+
+    );
+
+
+    alert(
+      "تمت الموافقة على الحساب ✅"
     );
 
   }
 
+  catch (error) {
 
-  // ==========================================
-  // تغيير حالة الخدمة
-  // ==========================================
+    console.error(error);
 
-  async function changeStatus(
-    id,
-    status
-  ) {
+    alert(
+      "حدث خطأ أثناء الموافقة على الحساب."
+    );
 
-    try {
+  }
 
-      await update(
-        ref(
-          database,
-          "services/" + id
-        ),
-        {
-          status: status
-        }
-      );
+}
 
 
-      if (status === "approved") {
+/* =========================================
+   رفض حساب
+========================================= */
 
-        alert(
-          "تمت الموافقة على الخدمة ✅"
-        );
 
-      } else {
+async function rejectUser(
+  uid
+) {
 
-        alert(
-          "تم رفض الخدمة ❌"
-        );
+  try {
+
+    await update(
+
+      ref(
+        database,
+        "users/" + uid
+      ),
+
+      {
+        status:
+          "rejected"
+      }
+
+    );
+
+
+    alert(
+      "تم رفض الحساب ❌"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      "حدث خطأ أثناء رفض الحساب."
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   تحميل طلبات الخدمات
+========================================= */
+
+
+function loadServices() {
+
+
+  const servicesRef =
+    ref(
+      database,
+      "services"
+    );
+
+
+  onValue(
+
+    servicesRef,
+
+    (snapshot) => {
+
+
+      servicesContainer.innerHTML =
+        "";
+
+
+      const data =
+        snapshot.val();
+
+
+      if (!data) {
+
+        servicesContainer.innerHTML = `
+
+          <div class="empty">
+
+            لا توجد طلبات خدمات حاليًا.
+
+          </div>
+
+        `;
+
+        return;
 
       }
 
-    } catch (error) {
+
+      let pendingCount =
+        0;
+
+
+      Object.entries(data).forEach(
+
+        ([id, service]) => {
+
+
+          if (
+            service.status !== "pending"
+          ) {
+
+            return;
+
+          }
+
+
+          pendingCount++;
+
+
+          const request =
+            document.createElement(
+              "div"
+            );
+
+
+          request.className =
+            "request";
+
+
+          request.innerHTML = `
+
+            <h3>
+
+              🛠️ ${escapeHTML(
+                service.name
+              )}
+
+            </h3>
+
+
+            <div class="info">
+
+              <strong>
+                التصنيف:
+              </strong>
+
+              ${escapeHTML(
+                service.category
+              )}
+
+            </div>
+
+
+            <div class="info">
+
+              <strong>
+                الوصف:
+              </strong>
+
+              ${escapeHTML(
+                service.description
+              )}
+
+            </div>
+
+
+            <div class="info">
+
+              <strong>
+                الهاتف:
+              </strong>
+
+              ${escapeHTML(
+                service.phone
+              )}
+
+            </div>
+
+
+            <div class="info">
+
+              <strong>
+                العنوان:
+              </strong>
+
+              ${escapeHTML(
+                service.address
+              )}
+
+            </div>
+
+
+            <div class="actions">
+
+              <button
+                class="approve"
+                data-service-id="${id}">
+
+                ✅ موافقة
+
+              </button>
+
+
+              <button
+                class="reject"
+                data-service-id="${id}">
+
+                ❌ رفض
+
+              </button>
+
+            </div>
+
+          `;
+
+
+          servicesContainer.appendChild(
+            request
+          );
+
+        }
+
+      );
+
+
+      if (
+        pendingCount === 0
+      ) {
+
+        servicesContainer.innerHTML = `
+
+          <div class="empty">
+
+            لا توجد طلبات خدمات معلقة حاليًا ✅
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      /*
+       * الموافقة على الخدمات
+       */
+
+      servicesContainer
+        .querySelectorAll(
+          "[data-service-id]"
+        )
+        .forEach(
+          (button) => {
+
+            button.addEventListener(
+              "click",
+              () => {
+
+                const id =
+                  button.dataset.serviceId;
+
+
+                const isApprove =
+                  button.classList.contains(
+                    "approve"
+                  );
+
+
+                changeServiceStatus(
+
+                  id,
+
+                  isApprove
+                    ? "approved"
+                    : "rejected"
+
+                );
+
+              }
+            );
+
+          }
+        );
+
+    },
+
+    (error) => {
+
+      console.error(error);
+
+      servicesContainer.innerHTML = `
+
+        <div class="empty">
+
+          حدث خطأ أثناء تحميل طلبات الخدمات ❌
+
+        </div>
+
+      `;
+
+    }
+
+  );
+
+}
+
+
+/* =========================================
+   تغيير حالة الخدمة
+========================================= */
+
+
+async function changeServiceStatus(
+  id,
+  status
+) {
+
+  try {
+
+    await update(
+
+      ref(
+        database,
+        "services/" + id
+      ),
+
+      {
+        status:
+          status
+      }
+
+    );
+
+
+    if (
+      status === "approved"
+    ) {
+
+      alert(
+        "تمت الموافقة على الخدمة ✅"
+      );
+
+    }
+
+    else {
+
+      alert(
+        "تم رفض الخدمة ❌"
+      );
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      "حدث خطأ أثناء تحديث الخدمة."
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   تسجيل الخروج
+========================================= */
+
+
+logoutBtn.addEventListener(
+
+  "click",
+
+  async () => {
+
+    try {
+
+      await signOut(
+        auth
+      );
+
+
+      window.location.href =
+        "login.html";
+
+    }
+
+    catch (error) {
 
       console.error(error);
 
       alert(
-        "حدث خطأ أثناء تحديث الطلب."
+        "حدث خطأ أثناء تسجيل الخروج."
       );
 
     }
 
   }
 
-
-  // ==========================================
-  // تسجيل الخروج
-  // ==========================================
-
-  logoutBtn.addEventListener(
-    "click",
-    async () => {
-
-      try {
-
-        await signOut(auth);
-
-        window.location.href =
-          "login.html";
-
-      } catch (error) {
-
-        console.error(error);
-
-        alert(
-          "حدث خطأ أثناء تسجيل الخروج."
-        );
-
-      }
-
-    }
-  );
+);
 
 
-  // ==========================================
-  // حماية النصوص
-  // ==========================================
+/* =========================================
+   حماية النصوص
+========================================= */
 
-  function escapeHTML(value) {
 
-    const div =
-      document.createElement("div");
+function escapeHTML(
+  value
+) {
 
-    div.textContent =
-      value || "";
+  const div =
+    document.createElement(
+      "div"
+    );
 
-    return div.innerHTML;
 
-  }
+  div.textContent =
+    value || "";
+
+
+  return div.innerHTML;
+
+}
+
 
 </script>
 
 </body>
+
 </html>
