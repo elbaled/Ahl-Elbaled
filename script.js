@@ -1,766 +1,568 @@
-script.js — أهل البلد
-
 import {
-  initializeApp
+    initializeApp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
 import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
+    getAuth,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 import {
-  getDatabase,
-  ref,
-  push,
-  set,
-  get,
-  onValue
+    getDatabase,
+    ref,
+    push,
+    set,
+    onValue,
+    get
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
 
-// ==========================================
+// ===============================
 // Firebase
-// ==========================================
+// ===============================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
-  authDomain: "ahl-elbaled2.firebaseapp.com",
-  databaseURL: "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ahl-elbaled2",
-  storageBucket: "ahl-elbaled2.firebasestorage.app",
-  messagingSenderId: "984455426367",
-  appId: "1:984455426367:web:5420f680f2a4f9b609238a",
-  measurementId: "G-NQFQWK5T57"
+    apiKey: "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+    authDomain: "ahl-elbaled2.firebaseapp.com",
+    databaseURL: "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ahl-elbaled2",
+    storageBucket: "ahl-elbaled2.firebasestorage.app",
+    messagingSenderId: "984455426367",
+    appId: "1:984455426367:web:5420f680f2a4f9b609238a",
+    measurementId: "G-NQFQWK5T57"
 };
 
-
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const database = getDatabase(app);
 
 
-// ==========================================
+// ===============================
 // عناصر الصفحة
-// ==========================================
+// ===============================
 
-const form =
-  document.getElementById("addServiceForm");
+const modal = document.getElementById("addServiceModal");
+const form = document.getElementById("addServiceForm");
+
+const heroButton = document.getElementById("addServiceHeroBtn");
+const addButton = document.getElementById("addServiceBtn");
+
+const closeButton = document.getElementById("closeModalBtn");
 
 const servicesContainer =
-  document.getElementById("servicesContainer");
-
-const addServiceHeroBtn =
-  document.getElementById("addServiceHeroBtn");
-
-const addServiceBtn =
-  document.getElementById("addServiceBtn");
-
-const addServiceModal =
-  document.getElementById("addServiceModal");
-
-const closeModalBtn =
-  document.getElementById("closeModalBtn");
-
-const loginBtn =
-  document.getElementById("loginBtn");
+    document.getElementById("servicesContainer");
 
 
-// ==========================================
-// بيانات المستخدم الحالي
-// ==========================================
+// ===============================
+// حالة المستخدم
+// ===============================
 
 let currentUser = null;
-
 let currentUserData = null;
 
 
-// ==========================================
+// ===============================
 // التحقق من تسجيل الدخول
-// ==========================================
+// ===============================
 
-onAuthStateChanged(
-  auth,
-  async (user) => {
+onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
-
     currentUserData = null;
 
-
-    // ========================================
-    // المستخدم غير مسجل
-    // ========================================
-
     if (!user) {
-
-      if (loginBtn) {
-
-        loginBtn.innerHTML = "👤 دخول";
-
-        loginBtn.href = "login.html";
-
-      }
-
-      return;
+        console.log("المستخدم غير مسجل الدخول");
+        return;
     }
 
-
-    // ========================================
-    // جلب بيانات المستخدم
-    // ========================================
+    console.log("المستخدم مسجل:", user.email);
 
     try {
 
-      const userRef =
-        ref(
-          database,
-          "users/" + user.uid
-        );
-
-
-      const snapshot =
-        await get(userRef);
-
-
-      if (snapshot.exists()) {
-
-        currentUserData =
-          snapshot.val();
-
-      }
-
-
-      // ======================================
-      // عرض اسم المستخدم
-      // ======================================
-
-      if (loginBtn) {
-
-        const name =
-          currentUserData?.name ||
-          user.displayName ||
-          "حسابي";
-
-
-        loginBtn.innerHTML =
-          "👤 " + escapeHTML(name);
-
-
-        loginBtn.href =
-          "#";
-
-        loginBtn.onclick =
-          (event) => {
-
-            event.preventDefault();
-
-            alert(
-              "أهلاً بيك " +
-              name +
-              " 👋"
-            );
-
-          };
-
-      }
-
-
-      // ======================================
-      // إذا كان أدمن
-      // ======================================
-
-      if (
-        currentUserData &&
-        currentUserData.role === "admin" &&
-        currentUserData.status === "approved"
-      ) {
-
-        createAdminButton();
-
-      }
-
-    } catch (error) {
-
-      console.error(
-        "خطأ في قراءة بيانات المستخدم:",
-        error
-      );
-
-    }
-
-  }
-);
-
-
-// ==========================================
-// إنشاء زر الإدارة للأدمن
-// ==========================================
-
-function createAdminButton() {
-
-  const headerActions =
-    document.querySelector(
-      ".header-actions"
-    );
-
-
-  if (!headerActions) return;
-
-
-  // منع تكرار الزر
-
-  if (
-    document.getElementById(
-      "adminPanelBtn"
-    )
-  ) {
-
-    return;
-
-  }
-
-
-  const adminButton =
-    document.createElement("a");
-
-
-  adminButton.id =
-    "adminPanelBtn";
-
-
-  adminButton.href =
-    "admin.html";
-
-
-  adminButton.className =
-    "login-btn";
-
-
-  adminButton.innerHTML =
-    "⚙️ لوحة الإدارة";
-
-
-  headerActions.appendChild(
-    adminButton
-  );
-
-}
-
-
-// ==========================================
-// فتح نافذة إضافة الخدمة
-// ==========================================
-
-function openModal() {
-
-  if (!addServiceModal) return;
-
-
-  // ========================================
-  // لازم يكون المستخدم مسجل دخول
-  // ========================================
-
-  if (!currentUser) {
-
-    alert(
-      "لازم تعمل حساب وتسجل الدخول أولًا لإضافة خدمة 🔐"
-    );
-
-
-    window.location.href =
-      "login.html";
-
-
-    return;
-
-  }
-
-
-  // ========================================
-  // التأكد أن الحساب معتمد
-  // ========================================
-
-  if (
-    currentUserData &&
-    currentUserData.status !== "approved"
-  ) {
-
-    alert(
-      "حسابك لم تتم الموافقة عليه بعد ⏳"
-    );
-
-
-    return;
-
-  }
-
-
-  addServiceModal.classList.add(
-    "active"
-  );
-
-
-  addServiceModal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-}
-
-
-// ==========================================
-// إغلاق النافذة
-// ==========================================
-
-function closeModal() {
-
-  if (!addServiceModal) return;
-
-
-  addServiceModal.classList.remove(
-    "active"
-  );
-
-
-  addServiceModal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-}
-
-
-// ==========================================
-// أزرار إضافة الخدمة
-// ==========================================
-
-if (addServiceHeroBtn) {
-
-  addServiceHeroBtn.addEventListener(
-    "click",
-    openModal
-  );
-
-}
-
-
-if (addServiceBtn) {
-
-  addServiceBtn.addEventListener(
-    "click",
-    openModal
-  );
-
-}
-
-
-if (closeModalBtn) {
-
-  closeModalBtn.addEventListener(
-    "click",
-    closeModal
-  );
-
-}
-
-
-// ==========================================
-// إغلاق عند الضغط على الخلفية
-// ==========================================
-
-if (addServiceModal) {
-
-  const overlay =
-    addServiceModal.querySelector(
-      ".modal-overlay"
-    );
-
-
-  if (overlay) {
-
-    overlay.addEventListener(
-      "click",
-      closeModal
-    );
-
-  }
-
-}
-
-
-// ==========================================
-// إضافة خدمة
-// ==========================================
-
-if (form) {
-
-  form.addEventListener(
-    "submit",
-    async (event) => {
-
-      event.preventDefault();
-
-
-      // ======================================
-      // التأكد من تسجيل الدخول
-      // ======================================
-
-      if (!currentUser) {
-
-        alert(
-          "لازم تعمل حساب وتسجل الدخول أولًا."
-        );
-
-        window.location.href =
-          "login.html";
-
-        return;
-
-      }
-
-
-      // ======================================
-      // التأكد من موافقة الحساب
-      // ======================================
-
-      if (
-        !currentUserData ||
-        currentUserData.status !== "approved"
-      ) {
-
-        alert(
-          "حسابك لم تتم الموافقة عليه من الإدارة بعد ⏳"
-        );
-
-        return;
-
-      }
-
-
-      const name =
-        document
-          .getElementById("serviceName")
-          ?.value
-          .trim();
-
-
-      const category =
-        document
-          .getElementById("serviceCategory")
-          ?.value;
-
-
-      const description =
-        document
-          .getElementById("serviceDescription")
-          ?.value
-          .trim();
-
-
-      const phone =
-        document
-          .getElementById("servicePhone")
-          ?.value
-          .trim();
-
-
-      const address =
-        document
-          .getElementById("serviceAddress")
-          ?.value
-          .trim();
-
-
-      if (
-        !name ||
-        !category ||
-        !description ||
-        !phone ||
-        !address
-      ) {
-
-        alert(
-          "من فضلك املأ جميع البيانات المطلوبة."
-        );
-
-        return;
-
-      }
-
-
-      try {
-
-        const servicesRef =
-          ref(
+        const userRef = ref(
             database,
-            "services"
-          );
-
-
-        const newService =
-          push(servicesRef);
-
-
-        await set(
-          newService,
-          {
-
-            name:
-              name,
-
-            category:
-              category,
-
-            description:
-              description,
-
-            phone:
-              phone,
-
-            address:
-              address,
-
-            status:
-              "pending",
-
-            userId:
-              currentUser.uid,
-
-            accountNumber:
-              currentUserData.accountNumber || null,
-
-            createdAt:
-              Date.now()
-
-          }
+            "users/" + user.uid
         );
 
+        const snapshot = await get(userRef);
 
-        alert(
-          "تم إرسال الخدمة للمراجعة بنجاح ✅"
-        );
+        if (snapshot.exists()) {
 
+            currentUserData = snapshot.val();
 
-        form.reset();
-
-        closeModal();
-
-
-      } catch (error) {
-
-        console.error(error);
-
-
-        alert(
-          "حدث خطأ أثناء إرسال الخدمة."
-        );
-
-      }
-
-    }
-  );
-
-}
-
-
-// ==========================================
-// عرض الخدمات المقبولة
-// ==========================================
-
-const servicesRef =
-  ref(
-    database,
-    "services"
-  );
-
-
-onValue(
-  servicesRef,
-  (snapshot) => {
-
-    if (!servicesContainer) return;
-
-
-    servicesContainer.innerHTML =
-      "";
-
-
-    const data =
-      snapshot.val();
-
-
-    if (!data) {
-
-      servicesContainer.innerHTML = `
-
-        <div class="empty-state">
-
-          <span>📭</span>
-
-          <h3>
-            لا توجد خدمات منشورة حاليًا
-          </h3>
-
-          <p>
-            سيتم عرض الخدمات بعد اعتمادها.
-          </p>
-
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    let approvedCount =
-      0;
-
-
-    Object.values(data).forEach(
-      (service) => {
-
-        if (
-          service.status !==
-          "approved"
-        ) {
-
-          return;
+            console.log(
+                "بيانات المستخدم:",
+                currentUserData
+            );
 
         }
 
+    } catch (error) {
 
-        approvedCount++;
-
-
-        const card =
-          document.createElement(
-            "div"
-          );
-
-
-        card.className =
-          "service-card";
-
-
-        card.innerHTML = `
-
-          <div class="service-image">
-            🏪
-          </div>
-
-          <div class="service-content">
-
-            <h3>
-              ${escapeHTML(
-                service.name
-              )}
-            </h3>
-
-            <p>
-              ${escapeHTML(
-                service.description
-              )}
-            </p>
-
-            <div class="service-meta">
-
-              <span class="meta-item">
-
-                📍
-                ${escapeHTML(
-                  service.address
-                )}
-
-              </span>
-
-              <span class="meta-item">
-
-                📞
-                ${escapeHTML(
-                  service.phone
-                )}
-
-              </span>
-
-            </div>
-
-          </div>
-
-        `;
-
-
-        servicesContainer.appendChild(
-          card
+        console.error(
+            "خطأ في قراءة بيانات المستخدم:",
+            error
         );
-
-      }
-    );
-
-
-    if (
-      approvedCount === 0
-    ) {
-
-      servicesContainer.innerHTML = `
-
-        <div class="empty-state">
-
-          <span>⏳</span>
-
-          <h3>
-            لا توجد خدمات منشورة حاليًا
-          </h3>
-
-          <p>
-            الخدمات الجديدة تظهر بعد موافقة الإدارة.
-          </p>
-
-        </div>
-
-      `;
 
     }
 
-  },
+});
 
-  (error) => {
 
-    console.error(
-      "Firebase error:",
-      error
+// ===============================
+// فتح نافذة إضافة الخدمة
+// ===============================
+
+function openModal() {
+
+    console.log("تم الضغط على أضف خدمتك");
+
+    if (!currentUser) {
+
+        alert(
+            "يجب تسجيل الدخول أولًا لإضافة خدمة."
+        );
+
+        window.location.href = "login.html";
+
+        return;
+    }
+
+
+    if (!currentUserData) {
+
+        alert(
+            "جاري تحميل بيانات الحساب، حاول مرة أخرى."
+        );
+
+        return;
+    }
+
+
+    if (currentUserData.status !== "approved") {
+
+        alert(
+            "حسابك لم تتم الموافقة عليه بعد."
+        );
+
+        return;
+    }
+
+
+    if (!modal) {
+
+        alert(
+            "خطأ: نافذة إضافة الخدمة غير موجودة في الصفحة."
+        );
+
+        console.error(
+            "addServiceModal غير موجود"
+        );
+
+        return;
+    }
+
+
+    modal.classList.add("active");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
     );
 
-  }
-);
+    document.body.style.overflow = "hidden";
+
+}
 
 
-// ==========================================
-// حماية النصوص
-// ==========================================
+// ===============================
+// إغلاق النافذة
+// ===============================
+
+function closeModal() {
+
+    if (!modal) return;
+
+    modal.classList.remove("active");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow = "";
+
+}
+
+
+// ===============================
+// أزرار إضافة الخدمة
+// ===============================
+
+if (heroButton) {
+
+    heroButton.addEventListener(
+        "click",
+        openModal
+    );
+
+}
+
+
+if (addButton) {
+
+    addButton.addEventListener(
+        "click",
+        openModal
+    );
+
+}
+
+
+// ===============================
+// زر الإغلاق
+// ===============================
+
+if (closeButton) {
+
+    closeButton.addEventListener(
+        "click",
+        closeModal
+    );
+
+}
+
+
+// ===============================
+// الضغط على الخلفية
+// ===============================
+
+if (modal) {
+
+    const overlay =
+        modal.querySelector(".modal-overlay");
+
+    if (overlay) {
+
+        overlay.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+}
+
+
+// ===============================
+// إرسال الخدمة
+// ===============================
+
+if (form) {
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            if (!currentUser) {
+
+                alert(
+                    "يجب تسجيل الدخول أولًا."
+                );
+
+                return;
+            }
+
+
+            const name =
+                document
+                    .getElementById("serviceName")
+                    .value
+                    .trim();
+
+
+            const category =
+                document
+                    .getElementById("serviceCategory")
+                    .value;
+
+
+            const description =
+                document
+                    .getElementById("serviceDescription")
+                    .value
+                    .trim();
+
+
+            const phone =
+                document
+                    .getElementById("servicePhone")
+                    .value
+                    .trim();
+
+
+            const address =
+                document
+                    .getElementById("serviceAddress")
+                    .value
+                    .trim();
+
+
+            if (
+                !name ||
+                !category ||
+                !description ||
+                !phone ||
+                !address
+            ) {
+
+                alert(
+                    "من فضلك املأ جميع البيانات."
+                );
+
+                return;
+            }
+
+
+            try {
+
+                const servicesRef =
+                    ref(
+                        database,
+                        "services"
+                    );
+
+
+                const newService =
+                    push(servicesRef);
+
+
+                await set(
+                    newService,
+                    {
+
+                        name: name,
+
+                        category: category,
+
+                        description: description,
+
+                        phone: phone,
+
+                        address: address,
+
+                        status: "pending",
+
+                        userId: currentUser.uid,
+
+                        userEmail: currentUser.email,
+
+                        createdAt: Date.now()
+
+                    }
+                );
+
+
+                alert(
+                    "تم إرسال الخدمة للمراجعة بنجاح ✅"
+                );
+
+
+                form.reset();
+
+                closeModal();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Firebase Error:",
+                    error
+                );
+
+                alert(
+                    "حدث خطأ أثناء إرسال الخدمة: " +
+                    error.message
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// ===============================
+// عرض الخدمات المقبولة
+// ===============================
+
+if (servicesContainer) {
+
+    const servicesRef =
+        ref(
+            database,
+            "services"
+        );
+
+
+    onValue(
+        servicesRef,
+        (snapshot) => {
+
+            servicesContainer.innerHTML = "";
+
+
+            const data =
+                snapshot.val();
+
+
+            if (!data) {
+
+                showEmptyServices();
+
+                return;
+            }
+
+
+            let count = 0;
+
+
+            Object.values(data).forEach(
+                (service) => {
+
+                    if (
+                        service.status !== "approved"
+                    ) {
+
+                        return;
+                    }
+
+
+                    count++;
+
+
+                    const card =
+                        document.createElement("div");
+
+
+                    card.className =
+                        "service-card";
+
+
+                    card.innerHTML = `
+
+                        <div class="service-image">
+                            🏪
+                        </div>
+
+                        <div class="service-content">
+
+                            <h3>
+                                ${escapeHTML(service.name)}
+                            </h3>
+
+                            <p>
+                                ${escapeHTML(service.description)}
+                            </p>
+
+                            <div class="service-meta">
+
+                                <span class="meta-item">
+                                    📍
+                                    ${escapeHTML(service.address)}
+                                </span>
+
+                                <span class="meta-item">
+                                    📞
+                                    ${escapeHTML(service.phone)}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+
+                    servicesContainer.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+
+            if (count === 0) {
+
+                showEmptyServices();
+
+            }
+
+        },
+
+        (error) => {
+
+            console.error(
+                "Firebase services error:",
+                error
+            );
+
+        }
+    );
+
+}
+
+
+// ===============================
+// رسالة عدم وجود خدمات
+// ===============================
+
+function showEmptyServices() {
+
+    if (!servicesContainer) return;
+
+    servicesContainer.innerHTML = `
+
+        <div class="empty-state">
+
+            <span>⏳</span>
+
+            <h3>
+                لا توجد خدمات منشورة حاليًا
+            </h3>
+
+            <p>
+                الخدمات الجديدة تظهر بعد موافقة الإدارة.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+// ===============================
+// حماية HTML
+// ===============================
 
 function escapeHTML(value) {
 
-  const div =
-    document.createElement(
-      "div"
-    );
+    const div =
+        document.createElement("div");
 
+    div.textContent =
+        value || "";
 
-  div.textContent =
-    value || "";
-
-
-  return div.innerHTML;
+    return div.innerHTML;
 
 }
 
 
 console.log(
-  "أهل البلد يعمل مع Firebase ✅"
+    "أهل البلد - script.js يعمل بنجاح ✅"
 );
