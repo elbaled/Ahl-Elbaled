@@ -1030,6 +1030,9 @@ function getCategoryName(category) {
         services:
             "🛠️ الخدمات",
 
+        craftsmen:
+            "🔨 الحرفيين",
+
         pharmacies:
             "💊 الصيدليات",
 
