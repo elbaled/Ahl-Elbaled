@@ -302,13 +302,8 @@
 
             min-height: 52px;
 
-            /*
-             * المسافة من اليمين للأيقونة
-             * والمسافة من الشمال لزر العين
-             */
-
             padding:
-                14px 48px 14px 62px;
+                14px 48px 14px 68px;
 
             border:
                 1px solid #dbe2ea;
@@ -356,14 +351,14 @@
 
 
         /* =====================================
-           PASSWORD TOGGLE
+           PASSWORD BUTTON
         ===================================== */
 
         .password-toggle {
 
             position: absolute;
 
-            left: 10px;
+            left: 8px;
 
             top: 50%;
 
@@ -378,11 +373,11 @@
 
             border-radius: 10px;
 
-            background: transparent;
+            background: #f1f5f9;
 
             color: #64748b;
 
-            font-size: 19px;
+            font-size: 18px;
 
             cursor: pointer;
 
@@ -553,4 +548,979 @@
 
             border-radius: 12px;
 
-            color: #2563eb
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+
+        }
+
+
+        .back:hover {
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+        }
+
+
+        .back.secondary {
+
+            color: #64748b;
+
+        }
+
+
+        .back.secondary:hover {
+
+            color: #334155;
+
+            background: #f8fafc;
+
+        }
+
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .login-footer {
+
+            text-align: center;
+
+            margin-top: 22px;
+
+            color: #94a3b8;
+
+            font-size: 12px;
+
+            line-height: 1.8;
+
+        }
+
+
+        /* =====================================
+           DEVELOPER CREDIT
+        ===================================== */
+
+        .developer-credit {
+
+            margin-top: 6px;
+
+            color: #2563eb;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            text-align: center;
+
+        }
+
+
+        /* =====================================
+           MOBILE
+        ===================================== */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 14px;
+
+                align-items: center;
+
+            }
+
+
+            .login-box {
+
+                padding:
+                    32px 20px 24px;
+
+                border-radius: 21px;
+
+            }
+
+
+            .logo {
+
+                width: 72px;
+
+                height: 72px;
+
+                border-radius: 21px;
+
+                font-size: 36px;
+
+            }
+
+
+            h1 {
+
+                font-size: 25px;
+
+            }
+
+
+            .subtitle {
+
+                margin-bottom: 25px;
+
+                font-size: 14px;
+
+            }
+
+
+            input {
+
+                min-height: 50px;
+
+                font-size: 16px;
+
+                padding:
+                    13px 48px 13px 64px;
+
+            }
+
+
+            .password-toggle {
+
+                left: 7px;
+
+                width: 40px;
+
+                height: 40px;
+
+            }
+
+
+            #loginButton {
+
+                min-height: 52px;
+
+                font-size: 16px;
+
+            }
+
+        }
+
+
+        /* =====================================
+           SMALL MOBILE
+        ===================================== */
+
+        @media (max-width: 380px) {
+
+            body {
+
+                padding: 10px;
+
+            }
+
+
+            .login-box {
+
+                padding:
+                    28px 16px 20px;
+
+                border-radius: 18px;
+
+            }
+
+
+            .logo {
+
+                width: 64px;
+
+                height: 64px;
+
+                font-size: 32px;
+
+            }
+
+
+            h1 {
+
+                font-size: 23px;
+
+            }
+
+
+            label {
+
+                font-size: 14px;
+
+            }
+
+
+            input {
+
+                padding:
+                    13px 46px 13px 60px;
+
+            }
+
+
+            .password-toggle {
+
+                left: 5px;
+
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-wrapper">
+
+
+    <div class="login-box">
+
+
+        <!-- =========================
+             LOGO
+        ========================== -->
+
+        <div class="logo-container">
+
+            <div class="logo">
+
+                🏠
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             TITLE
+        ========================== -->
+
+        <h1>
+
+            أهل البلد
+
+        </h1>
+
+
+        <p class="subtitle">
+
+            سجل دخولك للوصول إلى خدمات أهل البلد
+
+        </p>
+
+
+        <!-- =========================
+             LOGIN FORM
+        ========================== -->
+
+        <form id="loginForm">
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+
+                    البريد الإلكتروني
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+
+                        📧
+
+                    </span>
+
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="example@email.com"
+                        required
+                        autocomplete="username"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+
+                    كلمة المرور
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+
+                        🔒
+
+                    </span>
+
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="أدخل كلمة المرور"
+                        required
+                        autocomplete="current-password"
+                    >
+
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="إظهار كلمة المرور"
+                    >
+
+                        👁️
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGIN BUTTON -->
+
+            <button
+                type="submit"
+                id="loginButton"
+            >
+
+                دخول
+
+            </button>
+
+
+        </form>
+
+
+        <!-- =========================
+             MESSAGE
+        ========================== -->
+
+        <div id="message"></div>
+
+
+        <!-- =========================
+             LINKS
+        ========================== -->
+
+        <div class="links">
+
+
+            <a
+                href="register.html"
+                class="back"
+            >
+
+                📝 إنشاء حساب جديد
+
+            </a>
+
+
+            <a
+                href="index.html"
+                class="back secondary"
+            >
+
+                ← العودة للموقع
+
+            </a>
+
+
+        </div>
+
+
+        <!-- =========================
+             FOOTER
+        ========================== -->
+
+        <div class="login-footer">
+
+            أهل البلد © 2026
+
+            <div class="developer-credit">
+
+                مطور أحمد سمير
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script type="module">
+
+
+import {
+
+    initializeApp
+
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+
+import {
+
+    getAuth,
+
+    signInWithEmailAndPassword
+
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+
+import {
+
+    getDatabase,
+
+    ref,
+
+    get
+
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBpc-93tAPIRqYlrpKGc_Yg8QqxuX8PfGI",
+
+    authDomain:
+        "ahl-elbaled2.firebaseapp.com",
+
+    databaseURL:
+        "https://ahl-elbaled2-default-rtdb.europe-west1.firebasedatabase.app",
+
+    projectId:
+        "ahl-elbaled2",
+
+    storageBucket:
+        "ahl-elbaled2.firebasestorage.app",
+
+    messagingSenderId:
+        "984455426367",
+
+    appId:
+        "1:984455426367:web:5420f680f2a4f9b609238a",
+
+    measurementId:
+        "G-NQFQWK5T57"
+
+};
+
+
+
+/* =========================
+   INITIALIZE FIREBASE
+========================= */
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const auth =
+    getAuth(app);
+
+
+const database =
+    getDatabase(app);
+
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const loginForm =
+    document.getElementById("loginForm");
+
+
+const message =
+    document.getElementById("message");
+
+
+const loginButton =
+    document.getElementById("loginButton");
+
+
+const password =
+    document.getElementById("password");
+
+
+const passwordToggle =
+    document.getElementById("passwordToggle");
+
+
+
+/* =========================
+   SHOW / HIDE PASSWORD
+========================= */
+
+if (passwordToggle) {
+
+    passwordToggle.addEventListener(
+        "click",
+        () => {
+
+            if (
+                password.type ===
+                "password"
+            ) {
+
+                password.type =
+                    "text";
+
+                passwordToggle.textContent =
+                    "🙈";
+
+                passwordToggle.setAttribute(
+                    "aria-label",
+                    "إخفاء كلمة المرور"
+                );
+
+            }
+
+            else {
+
+                password.type =
+                    "password";
+
+                passwordToggle.textContent =
+                    "👁️";
+
+                passwordToggle.setAttribute(
+                    "aria-label",
+                    "إظهار كلمة المرور"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* =========================
+   LOGIN
+========================= */
+
+loginForm.addEventListener(
+
+    "submit",
+
+    async (event) => {
+
+
+        event.preventDefault();
+
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        const passwordValue =
+            document
+                .getElementById("password")
+                .value;
+
+
+
+        /* =========================
+           LOADING
+        ========================== */
+
+        message.textContent =
+            "جاري تسجيل الدخول...";
+
+        message.style.color =
+            "#2563eb";
+
+
+        loginButton.disabled =
+            true;
+
+
+        loginButton.textContent =
+            "جاري الدخول...";
+
+
+
+        try {
+
+
+            /* =========================
+               FIREBASE AUTH
+            ========================== */
+
+            const result =
+                await signInWithEmailAndPassword(
+
+                    auth,
+
+                    email,
+
+                    passwordValue
+
+                );
+
+
+
+            const uid =
+                result.user.uid;
+
+
+
+            console.log(
+                "تم تسجيل الدخول Firebase"
+            );
+
+
+            console.log(
+                "UID:",
+                uid
+            );
+
+
+
+            /* =========================
+               READ USER DATA
+            ========================== */
+
+            const userPath =
+                "users/" + uid;
+
+
+
+            const userRef =
+                ref(
+
+                    database,
+
+                    userPath
+
+                );
+
+
+
+            console.log(
+                "Database URL:",
+                firebaseConfig.databaseURL
+            );
+
+
+            console.log(
+                "Reading path:",
+                userPath
+            );
+
+
+
+            const snapshot =
+                await get(userRef);
+
+
+
+            console.log(
+                "Data exists:",
+                snapshot.exists()
+            );
+
+
+            console.log(
+                "Data:",
+                snapshot.val()
+            );
+
+
+
+            /* =========================
+               USER NOT FOUND
+            ========================== */
+
+            if (!snapshot.exists()) {
+
+
+                message.textContent =
+                    "بيانات الحساب غير موجودة في النظام.";
+
+                message.style.color =
+                    "#dc2626";
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    "دخول";
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               USER DATA
+            ========================== */
+
+            const userData =
+                snapshot.val();
+
+
+
+            /* =========================
+               PENDING
+            ========================== */
+
+            if (
+
+                userData.status ===
+                "pending"
+
+            ) {
+
+
+                message.textContent =
+                    "حسابك قيد المراجعة ⏳";
+
+                message.style.color =
+                    "#d97706";
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    "دخول";
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               REJECTED
+            ========================== */
+
+            if (
+
+                userData.status ===
+                "rejected"
+
+            ) {
+
+
+                message.textContent =
+                    "تم رفض طلب إنشاء الحساب ❌";
+
+                message.style.color =
+                    "#dc2626";
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    "دخول";
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               NOT APPROVED
+            ========================== */
+
+            if (
+
+                userData.status !==
+                "approved"
+
+            ) {
+
+
+                message.textContent =
+                    "لا يمكن الدخول بهذا الحساب حاليًا.";
+
+                message.style.color =
+                    "#dc2626";
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    "دخول";
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               APPROVED
+            ========================== */
+
+            message.textContent =
+                "تم تسجيل الدخول بنجاح ✅";
+
+
+            message.style.color =
+                "#16a34a";
+
+
+
+            console.log(
+                "الحساب معتمد"
+            );
+
+
+            console.log(
+                "Account Number:",
+                userData.accountNumber
+            );
+
+
+            console.log(
+                "Role:",
+                userData.role
+            );
+
+
+
+            /*
+             * مهم:
+             *
+             * الأدمن والمستخدم العادي
+             * يدخلان نفس الموقع.
+             *
+             * لن يتم تحويل الأدمن
+             * إلى admin.html.
+             */
+
+
+            setTimeout(
+
+                () => {
+
+                    window.location.href =
+                        "index.html";
+
+                },
+
+                700
+
+            );
+
+        }
+
+
+
+        /* =========================
+           ERROR
+        ========================== */
+
+        catch (error) {
+
+
+            console.error(
+                "Firebase Login Error:",
+                error
+            );
+
+
+            console.error(
+                "Error Code:",
+                error.code
+            );
+
+
+
+            message.textContent =
+                "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+
+            message.style.color =
+                "#dc2626";
+
+
+
+            loginButton.disabled =
+                false;
+
+
+            loginButton.textContent =
+                "دخول";
+
+        }
+
+    }
+
+);
+
+
+</script>
+
+
+</body>
+
+</html>
