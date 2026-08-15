@@ -14,8 +14,92 @@
     <title>أهل البلد | خدمات بلدك في مكان واحد</title>
 
     <link rel="stylesheet" href="style.css">
+<!-- مكتبة الخريطة -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    /* ===== خريطة تحديد مكان الخدمة ===== */
+
+.map-section {
+    margin-top: 25px;
+    direction: rtl;
+}
+
+.map-title {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.map-help {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+#serviceMap {
+    width: 100%;
+    height: 280px;
+    border-radius: 18px;
+    border: 2px solid #168c68;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.location-btn {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #168c68;
+    background: white;
+    color: #168c68;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.selected-location {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f1faf7;
+    color: #168c68;
+    text-align: center;
+    font-size: 14px;
+}
+
+.service-location {
+    margin-top: 25px;
+    direction: rtl;
+}
+
+.service-location-title {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.service-options {
+    display: flex;
+    gap: 10px;
+}
+
+.radio-option {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+}
+
+.radio-option input {
+    accent-color: #168c68;
+    margin-left: 5px;
+}
     <style>
 
         /* =========================================
@@ -1638,6 +1722,69 @@
 
                 <strong>
                     العنوان
+                    <!-- تحديد العنوان على الخريطة -->
+
+<div class="map-section">
+
+    <label class="map-title">
+        العنوان على الخريطة
+    </label>
+
+    <p class="map-help">
+        اضغط على الخريطة لتحديد مكان تقديم الخدمة
+    </p>
+
+    <div id="serviceMap"></div>
+
+    <button
+        type="button"
+        class="location-btn"
+        onclick="getMyLocation()">
+        📍 حدد موقعي الحالي
+    </button>
+
+    <div
+        id="selectedLocation"
+        class="selected-location">
+        لم يتم تحديد الموقع بعد
+    </div>
+
+    <input type="hidden" id="latitude">
+
+    <input type="hidden" id="longitude">
+
+</div>
+
+<!-- طريقة تقديم الخدمة -->
+
+<div class="service-location">
+
+    <label class="service-location-title">
+        نقدم الخدمة في
+    </label>
+
+    <div class="service-options">
+
+        <label class="radio-option">
+            <input
+                type="radio"
+                name="serviceType"
+                value="fixed"
+                checked>
+            📍 في موقعي فقط
+        </label>
+
+        <label class="radio-option">
+            <input
+                type="radio"
+                name="serviceType"
+                value="mobile">
+            🚗 خدمة متنقلة (أصل إليك)
+        </label>
+
+    </div>
+
+</div>
                 </strong>
 
                 <span id="detailsAddress">
@@ -2210,7 +2357,121 @@ document.addEventListener(
     type="module"
     src="script.js">
 </script>
+<script>
 
+let serviceMap;
+let serviceMarker;
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const defaultLocation = [
+        28.1099,
+        30.7503
+    ];
+
+    serviceMap = L.map("serviceMap").setView(
+        defaultLocation,
+        13
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap"
+        }
+    ).addTo(serviceMap);
+
+    serviceMap.on("click", function (event) {
+
+        setServiceLocation(
+            event.latlng.lat,
+            event.latlng.lng
+        );
+
+    });
+
+});
+
+
+function setServiceLocation(latitude, longitude) {
+
+    if (serviceMarker) {
+        serviceMap.removeLayer(serviceMarker);
+    }
+
+    serviceMarker = L.marker([
+        latitude,
+        longitude
+    ])
+    .addTo(serviceMap)
+    .bindPopup("📍 مكان تقديم الخدمة")
+    .openPopup();
+
+    serviceMap.setView(
+        [latitude, longitude],
+        17
+    );
+
+    document.getElementById("latitude").value =
+        latitude;
+
+    document.getElementById("longitude").value =
+        longitude;
+
+    document.getElementById("selectedLocation").innerHTML =
+        "✅ تم تحديد مكان الخدمة<br>" +
+        "خط العرض: " + latitude.toFixed(6) +
+        " | خط الطول: " + longitude.toFixed(6);
+}
+
+
+function getMyLocation() {
+
+    if (!navigator.geolocation) {
+
+        alert("جهازك لا يدعم تحديد الموقع");
+
+        return;
+    }
+
+    document.getElementById("selectedLocation").innerHTML =
+        "⏳ جاري تحديد موقعك...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        function (position) {
+
+            setServiceLocation(
+                position.coords.latitude,
+                position.coords.longitude
+            );
+
+        },
+
+        function () {
+
+            alert(
+                "لم نتمكن من تحديد موقعك. " +
+                "تأكد من تشغيل GPS والسماح للموقع."
+            );
+
+            document.getElementById(
+                "selectedLocation"
+            ).innerHTML =
+                "❌ لم يتم تحديد الموقع";
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
+}
+
+                </script>
 
 </body>
 
